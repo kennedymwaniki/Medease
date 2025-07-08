@@ -19,11 +19,16 @@ import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PatientIndexRouteImport } from './routes/patient/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as PatientProfileRouteImport } from './routes/patient/profile'
+import { Route as PatientPrescriptionsRouteImport } from './routes/patient/prescriptions'
 import { Route as PatientPrescriptionRouteImport } from './routes/patient/prescription'
+import { Route as PatientPrecriptionsRouteImport } from './routes/patient/precriptions'
 import { Route as PatientMedicationRouteImport } from './routes/patient/medication'
+import { Route as PatientMedicalHistoryRouteImport } from './routes/patient/medical-history'
 import { Route as PatientAppointmentsRouteImport } from './routes/patient/appointments'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminPatientsRouteImport } from './routes/admin/patients'
+import { Route as AdminMedicationRouteImport } from './routes/admin/medication'
 import { Route as AdminDoctorsRouteImport } from './routes/admin/doctors'
 import { Route as AdminAppointmentRouteImport } from './routes/admin/appointment'
 
@@ -77,14 +82,34 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const PatientProfileRoute = PatientProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => PatientRouteRoute,
+} as any)
+const PatientPrescriptionsRoute = PatientPrescriptionsRouteImport.update({
+  id: '/prescriptions',
+  path: '/prescriptions',
+  getParentRoute: () => PatientRouteRoute,
+} as any)
 const PatientPrescriptionRoute = PatientPrescriptionRouteImport.update({
   id: '/prescription',
   path: '/prescription',
   getParentRoute: () => PatientRouteRoute,
 } as any)
+const PatientPrecriptionsRoute = PatientPrecriptionsRouteImport.update({
+  id: '/precriptions',
+  path: '/precriptions',
+  getParentRoute: () => PatientRouteRoute,
+} as any)
 const PatientMedicationRoute = PatientMedicationRouteImport.update({
   id: '/medication',
   path: '/medication',
+  getParentRoute: () => PatientRouteRoute,
+} as any)
+const PatientMedicalHistoryRoute = PatientMedicalHistoryRouteImport.update({
+  id: '/medical-history',
+  path: '/medical-history',
   getParentRoute: () => PatientRouteRoute,
 } as any)
 const PatientAppointmentsRoute = PatientAppointmentsRouteImport.update({
@@ -100,6 +125,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
 const AdminPatientsRoute = AdminPatientsRouteImport.update({
   id: '/patients',
   path: '/patients',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminMedicationRoute = AdminMedicationRouteImport.update({
+  id: '/medication',
+  path: '/medication',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminDoctorsRoute = AdminDoctorsRouteImport.update({
@@ -124,11 +154,16 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/admin/appointment': typeof AdminAppointmentRoute
   '/admin/doctors': typeof AdminDoctorsRoute
+  '/admin/medication': typeof AdminMedicationRoute
   '/admin/patients': typeof AdminPatientsRoute
   '/admin/users': typeof AdminUsersRoute
   '/patient/appointments': typeof PatientAppointmentsRoute
+  '/patient/medical-history': typeof PatientMedicalHistoryRoute
   '/patient/medication': typeof PatientMedicationRoute
+  '/patient/precriptions': typeof PatientPrecriptionsRoute
   '/patient/prescription': typeof PatientPrescriptionRoute
+  '/patient/prescriptions': typeof PatientPrescriptionsRoute
+  '/patient/profile': typeof PatientProfileRoute
   '/admin/': typeof AdminIndexRoute
   '/patient/': typeof PatientIndexRoute
 }
@@ -141,11 +176,16 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/admin/appointment': typeof AdminAppointmentRoute
   '/admin/doctors': typeof AdminDoctorsRoute
+  '/admin/medication': typeof AdminMedicationRoute
   '/admin/patients': typeof AdminPatientsRoute
   '/admin/users': typeof AdminUsersRoute
   '/patient/appointments': typeof PatientAppointmentsRoute
+  '/patient/medical-history': typeof PatientMedicalHistoryRoute
   '/patient/medication': typeof PatientMedicationRoute
+  '/patient/precriptions': typeof PatientPrecriptionsRoute
   '/patient/prescription': typeof PatientPrescriptionRoute
+  '/patient/prescriptions': typeof PatientPrescriptionsRoute
+  '/patient/profile': typeof PatientProfileRoute
   '/admin': typeof AdminIndexRoute
   '/patient': typeof PatientIndexRoute
 }
@@ -161,11 +201,16 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/admin/appointment': typeof AdminAppointmentRoute
   '/admin/doctors': typeof AdminDoctorsRoute
+  '/admin/medication': typeof AdminMedicationRoute
   '/admin/patients': typeof AdminPatientsRoute
   '/admin/users': typeof AdminUsersRoute
   '/patient/appointments': typeof PatientAppointmentsRoute
+  '/patient/medical-history': typeof PatientMedicalHistoryRoute
   '/patient/medication': typeof PatientMedicationRoute
+  '/patient/precriptions': typeof PatientPrecriptionsRoute
   '/patient/prescription': typeof PatientPrescriptionRoute
+  '/patient/prescriptions': typeof PatientPrescriptionsRoute
+  '/patient/profile': typeof PatientProfileRoute
   '/admin/': typeof AdminIndexRoute
   '/patient/': typeof PatientIndexRoute
 }
@@ -182,11 +227,16 @@ export interface FileRouteTypes {
     | '/services'
     | '/admin/appointment'
     | '/admin/doctors'
+    | '/admin/medication'
     | '/admin/patients'
     | '/admin/users'
     | '/patient/appointments'
+    | '/patient/medical-history'
     | '/patient/medication'
+    | '/patient/precriptions'
     | '/patient/prescription'
+    | '/patient/prescriptions'
+    | '/patient/profile'
     | '/admin/'
     | '/patient/'
   fileRoutesByTo: FileRoutesByTo
@@ -199,11 +249,16 @@ export interface FileRouteTypes {
     | '/services'
     | '/admin/appointment'
     | '/admin/doctors'
+    | '/admin/medication'
     | '/admin/patients'
     | '/admin/users'
     | '/patient/appointments'
+    | '/patient/medical-history'
     | '/patient/medication'
+    | '/patient/precriptions'
     | '/patient/prescription'
+    | '/patient/prescriptions'
+    | '/patient/profile'
     | '/admin'
     | '/patient'
   id:
@@ -218,11 +273,16 @@ export interface FileRouteTypes {
     | '/services'
     | '/admin/appointment'
     | '/admin/doctors'
+    | '/admin/medication'
     | '/admin/patients'
     | '/admin/users'
     | '/patient/appointments'
+    | '/patient/medical-history'
     | '/patient/medication'
+    | '/patient/precriptions'
     | '/patient/prescription'
+    | '/patient/prescriptions'
+    | '/patient/profile'
     | '/admin/'
     | '/patient/'
   fileRoutesById: FileRoutesById
@@ -310,6 +370,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/patient/profile': {
+      id: '/patient/profile'
+      path: '/profile'
+      fullPath: '/patient/profile'
+      preLoaderRoute: typeof PatientProfileRouteImport
+      parentRoute: typeof PatientRouteRoute
+    }
+    '/patient/prescriptions': {
+      id: '/patient/prescriptions'
+      path: '/prescriptions'
+      fullPath: '/patient/prescriptions'
+      preLoaderRoute: typeof PatientPrescriptionsRouteImport
+      parentRoute: typeof PatientRouteRoute
+    }
     '/patient/prescription': {
       id: '/patient/prescription'
       path: '/prescription'
@@ -317,11 +391,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PatientPrescriptionRouteImport
       parentRoute: typeof PatientRouteRoute
     }
+    '/patient/precriptions': {
+      id: '/patient/precriptions'
+      path: '/precriptions'
+      fullPath: '/patient/precriptions'
+      preLoaderRoute: typeof PatientPrecriptionsRouteImport
+      parentRoute: typeof PatientRouteRoute
+    }
     '/patient/medication': {
       id: '/patient/medication'
       path: '/medication'
       fullPath: '/patient/medication'
       preLoaderRoute: typeof PatientMedicationRouteImport
+      parentRoute: typeof PatientRouteRoute
+    }
+    '/patient/medical-history': {
+      id: '/patient/medical-history'
+      path: '/medical-history'
+      fullPath: '/patient/medical-history'
+      preLoaderRoute: typeof PatientMedicalHistoryRouteImport
       parentRoute: typeof PatientRouteRoute
     }
     '/patient/appointments': {
@@ -345,6 +433,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPatientsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/medication': {
+      id: '/admin/medication'
+      path: '/medication'
+      fullPath: '/admin/medication'
+      preLoaderRoute: typeof AdminMedicationRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/doctors': {
       id: '/admin/doctors'
       path: '/doctors'
@@ -365,6 +460,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteRouteChildren {
   AdminAppointmentRoute: typeof AdminAppointmentRoute
   AdminDoctorsRoute: typeof AdminDoctorsRoute
+  AdminMedicationRoute: typeof AdminMedicationRoute
   AdminPatientsRoute: typeof AdminPatientsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -373,6 +469,7 @@ interface AdminRouteRouteChildren {
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminAppointmentRoute: AdminAppointmentRoute,
   AdminDoctorsRoute: AdminDoctorsRoute,
+  AdminMedicationRoute: AdminMedicationRoute,
   AdminPatientsRoute: AdminPatientsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -384,15 +481,23 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 
 interface PatientRouteRouteChildren {
   PatientAppointmentsRoute: typeof PatientAppointmentsRoute
+  PatientMedicalHistoryRoute: typeof PatientMedicalHistoryRoute
   PatientMedicationRoute: typeof PatientMedicationRoute
+  PatientPrecriptionsRoute: typeof PatientPrecriptionsRoute
   PatientPrescriptionRoute: typeof PatientPrescriptionRoute
+  PatientPrescriptionsRoute: typeof PatientPrescriptionsRoute
+  PatientProfileRoute: typeof PatientProfileRoute
   PatientIndexRoute: typeof PatientIndexRoute
 }
 
 const PatientRouteRouteChildren: PatientRouteRouteChildren = {
   PatientAppointmentsRoute: PatientAppointmentsRoute,
+  PatientMedicalHistoryRoute: PatientMedicalHistoryRoute,
   PatientMedicationRoute: PatientMedicationRoute,
+  PatientPrecriptionsRoute: PatientPrecriptionsRoute,
   PatientPrescriptionRoute: PatientPrescriptionRoute,
+  PatientPrescriptionsRoute: PatientPrescriptionsRoute,
+  PatientProfileRoute: PatientProfileRoute,
   PatientIndexRoute: PatientIndexRoute,
 }
 

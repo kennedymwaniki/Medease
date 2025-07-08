@@ -19,7 +19,7 @@ import {
 
 import { NavDocuments } from '@/components/nav-documents'
 import { NavMain } from '@/components/nav-main'
-import { NavSecondary } from '@/components/nav-secondary'
+// import { NavSecondary } from '@/components/nav-secondary'
 import { NavUser } from '@/components/nav-user'
 import {
   Sidebar,
@@ -54,13 +54,13 @@ const data = {
       icon: IconChartBar,
     },
     {
-      title: 'Projects',
-      url: '#',
+      title: 'Patients',
+      url: 'patients',
       icon: IconFolder,
     },
     {
-      title: 'Team',
-      url: '#',
+      title: 'Medication',
+      url: 'medication',
       icon: IconUsers,
     },
   ],
@@ -158,7 +158,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
+              <a href="/">
                 <IconInnerShadowTop className="!size-5" />
                 <span className="text-base font-semibold">MedEase</span>
               </a>

@@ -1,11 +1,19 @@
+// import type { Patient } from '@/types/types'
 import api from './axios'
+import type { Patient } from '@/types/types'
 
-export const getPatients = async () => {
-  const response = await api.get('/patients?limit=20&page=1')
+export const getPatients = async (): Promise<Array<Patient>> => {
+  const response = await api.get('/patients')
   return response.data
 }
-export const getPatient = async (patientId: number) => {
+export const getPatient = async (
+  patientId: number,
+): Promise<Patient | null> => {
   const response = await api.get(`/patients/${patientId}`)
+  if (response.status !== 200) {
+    console.error('Failed to fetch patient data:', response)
+    throw new Error('Failed to fetch patient data')
+  }
   return response.data
 }
 export const createPatient = async (data: any) => {
