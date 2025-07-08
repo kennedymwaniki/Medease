@@ -1,15 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
-import UsersTable from '@/components/users/UsersTable'
+import MedicationsTable from '@/components/MedicationsTable'
 
-export const Route = createFileRoute('/admin/users')({
+export const Route = createFileRoute('/admin/medications')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
   return (
     <div>
-      <p>Hello users</p>
-      <UsersTable />
+      <MedicationsTable />
     </div>
   )
 }

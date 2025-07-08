@@ -49,6 +49,7 @@ export interface Doctor {
   specialization: string
   experience: number
   contact: string
+  name?: string
   isAvailable: boolean
   affiliation: string
   user: User

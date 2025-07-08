@@ -27,10 +27,14 @@ import { Route as PatientMedicationRouteImport } from './routes/patient/medicati
 import { Route as PatientMedicalHistoryRouteImport } from './routes/patient/medical-history'
 import { Route as PatientAppointmentsRouteImport } from './routes/patient/appointments'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminReportsRouteImport } from './routes/admin/reports'
+import { Route as AdminPrescriptionsRouteImport } from './routes/admin/prescriptions'
+import { Route as AdminPaymentsRouteImport } from './routes/admin/payments'
 import { Route as AdminPatientsRouteImport } from './routes/admin/patients'
-import { Route as AdminMedicationRouteImport } from './routes/admin/medication'
+import { Route as AdminMedicationsRouteImport } from './routes/admin/medications'
 import { Route as AdminDoctorsRouteImport } from './routes/admin/doctors'
-import { Route as AdminAppointmentRouteImport } from './routes/admin/appointment'
+import { Route as AdminAppointmentsRouteImport } from './routes/admin/appointments'
 
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
@@ -122,14 +126,34 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminPrescriptionsRoute = AdminPrescriptionsRouteImport.update({
+  id: '/prescriptions',
+  path: '/prescriptions',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminPatientsRoute = AdminPatientsRouteImport.update({
   id: '/patients',
   path: '/patients',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminMedicationRoute = AdminMedicationRouteImport.update({
-  id: '/medication',
-  path: '/medication',
+const AdminMedicationsRoute = AdminMedicationsRouteImport.update({
+  id: '/medications',
+  path: '/medications',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminDoctorsRoute = AdminDoctorsRouteImport.update({
@@ -137,9 +161,9 @@ const AdminDoctorsRoute = AdminDoctorsRouteImport.update({
   path: '/doctors',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminAppointmentRoute = AdminAppointmentRouteImport.update({
-  id: '/appointment',
-  path: '/appointment',
+const AdminAppointmentsRoute = AdminAppointmentsRouteImport.update({
+  id: '/appointments',
+  path: '/appointments',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 
@@ -152,10 +176,14 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/programs': typeof ProgramsRoute
   '/services': typeof ServicesRoute
-  '/admin/appointment': typeof AdminAppointmentRoute
+  '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/doctors': typeof AdminDoctorsRoute
-  '/admin/medication': typeof AdminMedicationRoute
+  '/admin/medications': typeof AdminMedicationsRoute
   '/admin/patients': typeof AdminPatientsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/prescriptions': typeof AdminPrescriptionsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/patient/appointments': typeof PatientAppointmentsRoute
   '/patient/medical-history': typeof PatientMedicalHistoryRoute
@@ -174,10 +202,14 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/programs': typeof ProgramsRoute
   '/services': typeof ServicesRoute
-  '/admin/appointment': typeof AdminAppointmentRoute
+  '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/doctors': typeof AdminDoctorsRoute
-  '/admin/medication': typeof AdminMedicationRoute
+  '/admin/medications': typeof AdminMedicationsRoute
   '/admin/patients': typeof AdminPatientsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/prescriptions': typeof AdminPrescriptionsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/patient/appointments': typeof PatientAppointmentsRoute
   '/patient/medical-history': typeof PatientMedicalHistoryRoute
@@ -199,10 +231,14 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/programs': typeof ProgramsRoute
   '/services': typeof ServicesRoute
-  '/admin/appointment': typeof AdminAppointmentRoute
+  '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/doctors': typeof AdminDoctorsRoute
-  '/admin/medication': typeof AdminMedicationRoute
+  '/admin/medications': typeof AdminMedicationsRoute
   '/admin/patients': typeof AdminPatientsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/prescriptions': typeof AdminPrescriptionsRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/patient/appointments': typeof PatientAppointmentsRoute
   '/patient/medical-history': typeof PatientMedicalHistoryRoute
@@ -225,10 +261,14 @@ export interface FileRouteTypes {
     | '/login'
     | '/programs'
     | '/services'
-    | '/admin/appointment'
+    | '/admin/appointments'
     | '/admin/doctors'
-    | '/admin/medication'
+    | '/admin/medications'
     | '/admin/patients'
+    | '/admin/payments'
+    | '/admin/prescriptions'
+    | '/admin/reports'
+    | '/admin/settings'
     | '/admin/users'
     | '/patient/appointments'
     | '/patient/medical-history'
@@ -247,10 +287,14 @@ export interface FileRouteTypes {
     | '/login'
     | '/programs'
     | '/services'
-    | '/admin/appointment'
+    | '/admin/appointments'
     | '/admin/doctors'
-    | '/admin/medication'
+    | '/admin/medications'
     | '/admin/patients'
+    | '/admin/payments'
+    | '/admin/prescriptions'
+    | '/admin/reports'
+    | '/admin/settings'
     | '/admin/users'
     | '/patient/appointments'
     | '/patient/medical-history'
@@ -271,10 +315,14 @@ export interface FileRouteTypes {
     | '/login'
     | '/programs'
     | '/services'
-    | '/admin/appointment'
+    | '/admin/appointments'
     | '/admin/doctors'
-    | '/admin/medication'
+    | '/admin/medications'
     | '/admin/patients'
+    | '/admin/payments'
+    | '/admin/prescriptions'
+    | '/admin/reports'
+    | '/admin/settings'
     | '/admin/users'
     | '/patient/appointments'
     | '/patient/medical-history'
@@ -426,6 +474,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/prescriptions': {
+      id: '/admin/prescriptions'
+      path: '/prescriptions'
+      fullPath: '/admin/prescriptions'
+      preLoaderRoute: typeof AdminPrescriptionsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/patients': {
       id: '/admin/patients'
       path: '/patients'
@@ -433,11 +509,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPatientsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/medication': {
-      id: '/admin/medication'
-      path: '/medication'
-      fullPath: '/admin/medication'
-      preLoaderRoute: typeof AdminMedicationRouteImport
+    '/admin/medications': {
+      id: '/admin/medications'
+      path: '/medications'
+      fullPath: '/admin/medications'
+      preLoaderRoute: typeof AdminMedicationsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/doctors': {
@@ -447,30 +523,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDoctorsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/appointment': {
-      id: '/admin/appointment'
-      path: '/appointment'
-      fullPath: '/admin/appointment'
-      preLoaderRoute: typeof AdminAppointmentRouteImport
+    '/admin/appointments': {
+      id: '/admin/appointments'
+      path: '/appointments'
+      fullPath: '/admin/appointments'
+      preLoaderRoute: typeof AdminAppointmentsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
   }
 }
 
 interface AdminRouteRouteChildren {
-  AdminAppointmentRoute: typeof AdminAppointmentRoute
+  AdminAppointmentsRoute: typeof AdminAppointmentsRoute
   AdminDoctorsRoute: typeof AdminDoctorsRoute
-  AdminMedicationRoute: typeof AdminMedicationRoute
+  AdminMedicationsRoute: typeof AdminMedicationsRoute
   AdminPatientsRoute: typeof AdminPatientsRoute
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
+  AdminPrescriptionsRoute: typeof AdminPrescriptionsRoute
+  AdminReportsRoute: typeof AdminReportsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminAppointmentRoute: AdminAppointmentRoute,
+  AdminAppointmentsRoute: AdminAppointmentsRoute,
   AdminDoctorsRoute: AdminDoctorsRoute,
-  AdminMedicationRoute: AdminMedicationRoute,
+  AdminMedicationsRoute: AdminMedicationsRoute,
   AdminPatientsRoute: AdminPatientsRoute,
+  AdminPaymentsRoute: AdminPaymentsRoute,
+  AdminPrescriptionsRoute: AdminPrescriptionsRoute,
+  AdminReportsRoute: AdminReportsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

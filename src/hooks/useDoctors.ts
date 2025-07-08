@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
-import { getDoctor, getDoctors } from '@/apis/doctorsApi'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { CreateDoctorDto } from './../types/types'
+import { createDoctor, getDoctor, getDoctors } from '@/apis/doctorsApi'
 
 export const useDoctors = () => {
   const { data, isLoading, error } = useQuery({
@@ -17,4 +18,17 @@ export const useDoctor = (doctorId: number) => {
   })
 
   return { data, isLoading, error }
+}
+
+export const useCreateDoctor = () => {
+  const queryClient = useQueryClient()
+  const { mutate, isPending, error } = useMutation({
+    mutationFn: (data: CreateDoctorDto) => createDoctor(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['doctors'],
+      })
+    },
+  })
+  return { createDoctor: mutate, isPending, error }
 }

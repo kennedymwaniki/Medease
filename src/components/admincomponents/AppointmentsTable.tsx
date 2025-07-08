@@ -14,10 +14,10 @@ import type {
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
-import type { User } from '@/types/types'
-import { useDeleteUser, useUsers } from '@/hooks/useUser'
+import type { Appointment } from '@/types/types'
+import { useAppointments, useDeleteAppointment } from '@/hooks/useAppointments'
 
-const UsersTable = () => {
+const AppointmentsTable = () => {
   const [search, setSearch] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -26,10 +26,10 @@ const UsersTable = () => {
     pageSize: 10,
   })
 
-  const { data: users, error } = useUsers()
-  const { isPending, removeUser } = useDeleteUser()
-  console.log('Users data:', users)
-  const columnHelper = createColumnHelper<User>()
+  const { appointments, isLoading, error } = useAppointments()
+  const { isPending, removeAppointment } = useDeleteAppointment()
+  console.log('Appointments data:', appointments)
+  const columnHelper = createColumnHelper<Appointment>()
 
   const columns = useMemo(
     () => [
@@ -38,41 +38,42 @@ const UsersTable = () => {
         cell: (info) => info.getValue(),
         size: 80,
       }),
-      columnHelper.accessor('firstname', {
-        header: 'First Name',
+      columnHelper.accessor('date', {
+        header: 'Date',
+        cell: (info) => {
+          const date = new Date(info.getValue())
+          return (
+            <div className="max-w-xs truncate" title={date.toDateString()}>
+              {date.toLocaleDateString()}
+            </div>
+          )
+        },
+      }),
+      columnHelper.accessor('time', {
+        header: 'Time',
         cell: (info) => (
           <div className="max-w-xs truncate" title={info.getValue()}>
-            {info.getValue()}
+            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+              {info.getValue()}
+            </span>
           </div>
         ),
       }),
-      columnHelper.accessor('lastname', {
-        header: 'Last Name',
-        cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            {info.getValue()}
-          </div>
-        ),
-      }),
-      columnHelper.accessor('email', {
-        header: 'Email',
-        cell: (info) => (
-          <div className="max-w-md truncate" title={info.getValue()}>
-            {info.getValue()}
-          </div>
-        ),
-      }),
-      columnHelper.accessor('role', {
-        header: 'Role',
+      columnHelper.accessor('status', {
+        header: 'Status',
         cell: (info) => (
           <div className="max-w-xs truncate" title={info.getValue()}>
             <span
               className={`px-2 py-1 rounded-full text-xs font-medium ${
-                info.getValue().toLowerCase() === 'doctor'
-                  ? 'bg-blue-100 text-blue-800'
-                  : info.getValue().toLowerCase() === 'admin'
-                    ? 'bg-purple-100 text-purple-800'
-                    : 'bg-gray-100 text-gray-800'
+                info.getValue().toLowerCase() === 'confirmed'
+                  ? 'bg-green-100 text-green-800'
+                  : info.getValue().toLowerCase() === 'pending'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : info.getValue().toLowerCase() === 'cancelled'
+                      ? 'bg-red-100 text-red-800'
+                      : info.getValue().toLowerCase() === 'completed'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-gray-100 text-gray-800'
               }`}
             >
               {info.getValue()}
@@ -80,13 +81,55 @@ const UsersTable = () => {
           </div>
         ),
       }),
+      columnHelper.accessor('duration', {
+        header: 'Duration',
+        cell: (info) => (
+          <div
+            className="max-w-xs truncate"
+            title={`${info.getValue()} minutes`}
+          >
+            <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+              {info.getValue()} min
+            </span>
+          </div>
+        ),
+      }),
+      columnHelper.accessor('title', {
+        header: 'Title',
+        cell: (info) => (
+          <div className="max-w-md truncate" title={info.getValue()}>
+            <span className="font-medium">{info.getValue()}</span>
+          </div>
+        ),
+      }),
+      columnHelper.accessor('patient.name', {
+        header: 'Patient',
+        cell: (info) => (
+          <div className="max-w-xs truncate" title={info.getValue()}>
+            {info.getValue()}
+          </div>
+        ),
+      }),
+      columnHelper.accessor('doctor', {
+        header: 'Doctor',
+        cell: (info) => {
+          const doctor = info.getValue()
+          const doctorName = doctor.name ? `Dr. ${doctor.name}` : 'Dr. '
+
+          return (
+            <div className="max-w-xs truncate" title={doctorName}>
+              {doctorName}
+            </div>
+          )
+        },
+      }),
       columnHelper.display({
         id: 'actions',
         header: 'Actions',
         cell: (info) => (
-          <div className="flex gap-2" title="User Actions">
+          <div className="flex gap-2" title="Appointment Actions">
             <button
-              onClick={() => removeUser(info.row.original.id)}
+              onClick={() => removeAppointment(info.row.original.id)}
               className="p-1 hover:bg-red-50 rounded transition-colors"
               disabled={isPending}
             >
@@ -100,7 +143,7 @@ const UsersTable = () => {
         size: 100,
       }),
     ],
-    [isPending, removeUser, columnHelper],
+    [isPending, removeAppointment, columnHelper],
   )
 
   // Global filter function
@@ -109,18 +152,26 @@ const UsersTable = () => {
       const searchValue = value.toLowerCase()
       const rowData = row.original
 
+      const doctorName =
+        rowData.doctor?.name ||
+        (rowData.doctor?.user?.firstname
+          ? `${rowData.doctor.user.firstname} ${rowData.doctor.user.lastname}`
+          : '')
+
       return (
-        rowData.firstname?.toLowerCase().includes(searchValue) ||
-        rowData.lastname?.toLowerCase().includes(searchValue) ||
-        rowData.email?.toLowerCase().includes(searchValue) ||
-        rowData.role?.toLowerCase().includes(searchValue) ||
+        rowData.title?.toLowerCase().includes(searchValue) ||
+        rowData.status?.toLowerCase().includes(searchValue) ||
+        rowData.patient?.name?.toLowerCase().includes(searchValue) ||
+        doctorName?.toLowerCase().includes(searchValue) ||
+        rowData.date?.toLowerCase().includes(searchValue) ||
+        rowData.time?.toLowerCase().includes(searchValue) ||
         rowData.id?.toString().includes(searchValue)
       )
     }
   }, [])
 
   const table = useReactTable({
-    data: users || [],
+    data: appointments || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -140,13 +191,17 @@ const UsersTable = () => {
   })
 
   if (isPending) {
-    return <div className="p-4 text-blue-600">Deleting user...</div>
+    return <div className="p-4 text-blue-600">Deleting appointment...</div>
+  }
+
+  if (isLoading) {
+    return <div className="p-4 text-blue-600">Loading appointments...</div>
   }
 
   if (error) {
     return (
       <div className="p-4 text-red-600">
-        Error fetching users: {error.message}
+        Error fetching appointments: {error.message}
       </div>
     )
   }
@@ -162,14 +217,14 @@ const UsersTable = () => {
           htmlFor="search"
           className="block text-sm font-medium text-gray-700 mb-2"
         >
-          Search Users:
+          Search Appointments:
         </label>
         <input
           id="search"
           type="text"
           value={search}
           onChange={handleSearch}
-          placeholder="Search by name, email, role, or ID..."
+          placeholder="Search by title, patient, doctor, date, time, or status..."
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
@@ -244,15 +299,15 @@ const UsersTable = () => {
 
       {table.getRowModel().rows.length === 0 && (
         <div className="text-center py-8 text-gray-500">
-          No users found matching your search.
+          No appointments found matching your search.
         </div>
       )}
 
       <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div className="text-sm text-gray-500">
           Showing {table.getRowModel().rows.length} of{' '}
-          {table.getPrePaginationRowModel().rows.length} users
-          {search && ` (filtered from ${users?.length || 0} total)`}
+          {table.getPrePaginationRowModel().rows.length} appointments
+          {search && ` (filtered from ${appointments?.length || 0} total)`}
         </div>
 
         <div className="flex items-center gap-2">
@@ -299,4 +354,4 @@ const UsersTable = () => {
   )
 }
 
-export default UsersTable
+export default AppointmentsTable

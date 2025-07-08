@@ -2,7 +2,7 @@ import api from './axios'
 // import type { PaginatedUsersResponse } from '@/types/types'
 
 export const getUsers = async () => {
-  const response = await api.get('/users?limit=20&page=1')
+  const response = await api.get('/users')
   return response.data
 }
 export const getUser = async (userId: number) => {
