@@ -22,15 +22,15 @@ export const useLogin = () => {
 }
 
 export const useRegister = () => {
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, error } = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
       console.log('Registration successful:', data)
     },
-    onError: (error) => {
+    onError: () => {
       // Handle registration error, e.g., show an error message
-      console.error('Registration failed:', error)
+      console.error('Registration failed', error)
     },
   })
-  return { mutate, isPending }
+  return { mutate, isPending, error }
 }

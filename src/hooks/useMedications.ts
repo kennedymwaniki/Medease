@@ -1,6 +1,8 @@
 // import { useDeleteMedication } from '@/hooks/useMedications'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import {
+  createMedication,
   deleteMedication,
   getMedications,
   updateMedication,
@@ -9,8 +11,8 @@ import {
 export const useMedications = () => {
   const {
     data: medications,
-    isLoading,
-    isError,
+    // isLoading,
+    isPending,
     error,
   } = useQuery({
     queryKey: ['medications'],
@@ -19,8 +21,8 @@ export const useMedications = () => {
 
   return {
     medications,
-    isLoading,
-    isError,
+    // isLoading,
+    isPending,
     error,
   }
 }
@@ -52,4 +54,29 @@ export const useDeleteMedication = () => {
   })
 
   return { removeMedication, isPending, isError, error }
+}
+
+export const useCreateMedication = () => {
+  const queryClient = useQueryClient()
+  const {
+    mutate: addMedication,
+    isPending,
+    isError,
+    error,
+  } = useMutation({
+    mutationKey: ['medications'],
+    mutationFn: createMedication,
+    onSuccess: () => {
+      toast.success('Medication created successfully!')
+      queryClient.invalidateQueries({
+        queryKey: ['medications'],
+      })
+    },
+
+    onError: () => {
+      toast.error('Failed to create medication. Please try again.')
+      console.error('Error creating medication:', error)
+    },
+  })
+  return { addMedication, isPending, isError, error }
 }

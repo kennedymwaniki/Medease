@@ -35,7 +35,7 @@ function RouteComponent() {
     },
     {
       label: 'Find Doctors',
-      url: '/patient/find-doctors',
+      url: '/patient/doctors',
       icon: <FaUserMd />,
     },
     {

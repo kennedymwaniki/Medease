@@ -6,7 +6,7 @@ export const login = async (data: any) => {
 }
 
 export const registerUser = async (data: any) => {
-  const response = await api.post('/auth/register', data)
+  const response = await api.post('/users', data)
   return response.data
 }
 export const logout = async () => {
