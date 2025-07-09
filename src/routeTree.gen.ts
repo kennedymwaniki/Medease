@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProgramsRouteImport } from './routes/programs'
+import { Route as OtpVerificationRouteImport } from './routes/otp-verification'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DoctorsRouteImport } from './routes/doctors'
 import { Route as AboutRouteImport } from './routes/about'
@@ -52,6 +53,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const ProgramsRoute = ProgramsRouteImport.update({
   id: '/programs',
   path: '/programs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OtpVerificationRoute = OtpVerificationRouteImport.update({
+  id: '/otp-verification',
+  path: '/otp-verification',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/doctors': typeof DoctorsRoute
   '/login': typeof LoginRoute
+  '/otp-verification': typeof OtpVerificationRoute
   '/programs': typeof ProgramsRoute
   '/register': typeof RegisterRoute
   '/services': typeof ServicesRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/doctors': typeof DoctorsRoute
   '/login': typeof LoginRoute
+  '/otp-verification': typeof OtpVerificationRoute
   '/programs': typeof ProgramsRoute
   '/register': typeof RegisterRoute
   '/services': typeof ServicesRoute
@@ -253,6 +261,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/doctors': typeof DoctorsRoute
   '/login': typeof LoginRoute
+  '/otp-verification': typeof OtpVerificationRoute
   '/programs': typeof ProgramsRoute
   '/register': typeof RegisterRoute
   '/services': typeof ServicesRoute
@@ -286,6 +295,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/doctors'
     | '/login'
+    | '/otp-verification'
     | '/programs'
     | '/register'
     | '/services'
@@ -315,6 +325,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/doctors'
     | '/login'
+    | '/otp-verification'
     | '/programs'
     | '/register'
     | '/services'
@@ -346,6 +357,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/doctors'
     | '/login'
+    | '/otp-verification'
     | '/programs'
     | '/register'
     | '/services'
@@ -378,6 +390,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   DoctorsRoute: typeof DoctorsRoute
   LoginRoute: typeof LoginRoute
+  OtpVerificationRoute: typeof OtpVerificationRoute
   ProgramsRoute: typeof ProgramsRoute
   RegisterRoute: typeof RegisterRoute
   ServicesRoute: typeof ServicesRoute
@@ -404,6 +417,13 @@ declare module '@tanstack/react-router' {
       path: '/programs'
       fullPath: '/programs'
       preLoaderRoute: typeof ProgramsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/otp-verification': {
+      id: '/otp-verification'
+      path: '/otp-verification'
+      fullPath: '/otp-verification'
+      preLoaderRoute: typeof OtpVerificationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -658,6 +678,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   DoctorsRoute: DoctorsRoute,
   LoginRoute: LoginRoute,
+  OtpVerificationRoute: OtpVerificationRoute,
   ProgramsRoute: ProgramsRoute,
   RegisterRoute: RegisterRoute,
   ServicesRoute: ServicesRoute,

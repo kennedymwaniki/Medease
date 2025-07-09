@@ -39,6 +39,7 @@ export interface User {
   lastname: string
   otp?: string
   secret?: string
+  imagelink?: string | null
   hashedRefreshToken?: string | null
   patient?: Patient
   doctor?: Doctor
