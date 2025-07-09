@@ -13,7 +13,7 @@ const SideNavigation = ({
   navItems: Array<sideNavItemProps>
 }) => {
   return (
-    <div className="h-screen bg-white/20 shadow-lg">
+    <div className="h-screen bg-white/20 shadow-lg w-64">
       <div className="p-4">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">

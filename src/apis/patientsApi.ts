@@ -1,4 +1,3 @@
-// import type { Patient } from '@/types/types'
 import api from './axios'
 import type { Patient } from '@/types/types'
 
@@ -14,6 +13,7 @@ export const getPatient = async (
     console.error('Failed to fetch patient data:', response)
     throw new Error('Failed to fetch patient data')
   }
+  console.log('Fetched patient data:', response.data)
   return response.data
 }
 export const createPatient = async (data: any) => {

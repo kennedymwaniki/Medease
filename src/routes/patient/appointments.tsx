@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import PatientAppointments from '@/components/patient/PatientAppointments'
+// import PatientAppointments from '@/components/patient/PatientAppointments'
+import PatientAppointmentTable from '@/components/patient/PatientAppointmentTable'
 
 export const Route = createFileRoute('/patient/appointments')({
   component: RouteComponent,
@@ -8,8 +9,7 @@ export const Route = createFileRoute('/patient/appointments')({
 function RouteComponent() {
   return (
     <div>
-      <h1>Your Appointments</h1>
-      <PatientAppointments />
+      <PatientAppointmentTable />
     </div>
   )
 }

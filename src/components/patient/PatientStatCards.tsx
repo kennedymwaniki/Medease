@@ -1,5 +1,6 @@
 import React from 'react'
 import { Activity, Bell, Calendar, Pill } from 'lucide-react'
+import { usePatient } from '@/hooks/usePatients'
 
 interface StatCardData {
   icon: React.ReactNode
@@ -10,12 +11,20 @@ interface StatCardData {
   iconColor: string
 }
 
-const StatCard: React.FC = () => {
+const PatientStatCard: React.FC = () => {
+  // const {data: patientData, isLoading, error} = usePatient(patientId)
+  const patientId = 1
+  const { data: patientData, isLoading, error } = usePatient(patientId)
+  console.log('Patient Data:', patientData)
+
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>Error loading patient data</div>
+
   const statData: Array<StatCardData> = [
     {
       icon: <Calendar size={24} />,
       title: 'Next Appointment',
-      number: '2 Days',
+      number: patientData?.appointments.length.toString() || '0',
       subtitle: 'Dr. Smith - Cardiology',
       bgColor: 'bg-blue-50',
       iconColor: 'text-blue-600',
@@ -23,7 +32,7 @@ const StatCard: React.FC = () => {
     {
       icon: <Pill size={24} />,
       title: 'Active Prescriptions',
-      number: '4',
+      number: patientData?.prescriptions.length.toString() || '0',
       subtitle: 'All up to date',
       bgColor: 'bg-green-50',
       iconColor: 'text-green-600',
@@ -71,4 +80,4 @@ const StatCard: React.FC = () => {
   )
 }
 
-export default StatCard
+export default PatientStatCard
