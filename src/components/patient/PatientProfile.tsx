@@ -38,12 +38,11 @@ function PatientProfile() {
       // TODO: Implement actual image upload logic here
       const formData = new FormData()
       formData.append('image', selectedImage)
-      await uploadFile(formData)
 
       console.log('Uploading image:', selectedImage.name)
 
-      // Simulate upload delay
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const data = await uploadFile(formData)
+      console.log('This is the data after upload:', data)
 
       // Reset form after successful upload
       setSelectedImage(null)

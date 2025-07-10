@@ -37,7 +37,7 @@ const SideNavigation = ({
               activeProps={{
                 className: 'bg-indigo-500 text-white shadow-sm',
               }}
-              className="block rounded-lg transition-colors duration-200"
+              className="block rounded-lg transition-colors duration-200 text-nowrap"
             >
               <div className="flex items-center gap-3 p-3 hover:bg-indigo-400 hover:text-white rounded-lg group">
                 <span className="text-gray-600 group-hover:text-white">

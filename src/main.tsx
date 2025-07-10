@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
@@ -9,6 +10,7 @@ import { routeTree } from './routeTree.gen'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
+import { Toaster } from 'sonner'
 
 // Create a new router instance
 const router = createRouter({
@@ -36,6 +38,7 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <TanStackQueryProvider.Provider>
+        <Toaster position="top-center" richColors closeButton duration={3000} />
         <RouterProvider router={router} />
       </TanStackQueryProvider.Provider>
     </StrictMode>,
