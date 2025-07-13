@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { deleteUser, getUser, getUsers } from '@/apis/usersApi'
+import type { UpdateUserDto } from '@/types/types'
+import { deleteUser, getUser, getUsers, updateUser } from '@/apis/usersApi'
 
 export const useUsers = () => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ['users'],
+    queryKey: ['user'],
     queryFn: getUsers,
   })
 
@@ -31,7 +32,7 @@ export const useDeleteUser = () => {
       toast.success('User deleted successfully', {
         position: 'top-right',
       })
-      queryClient.invalidateQueries({ queryKey: ['users'] })
+      queryClient.invalidateQueries({ queryKey: ['user'] })
     },
     onError: () => {
       toast.error(`Error deleting user`)
@@ -41,5 +42,34 @@ export const useDeleteUser = () => {
     isPending,
     error,
     removeUser,
+  }
+}
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient()
+  const {
+    isPending,
+    error,
+    mutate: updateUserProfile,
+  } = useMutation({
+    mutationFn: ({ userId, data }: { userId: number; data: UpdateUserDto }) =>
+      updateUser(userId, data),
+    onSuccess: () => {
+      toast.success('User updated successfully', {
+        position: 'top-right',
+      })
+      queryClient.invalidateQueries({ queryKey: ['user', 'patient'] })
+
+      // Invalidate all patient queries
+      queryClient.invalidateQueries({ queryKey: ['patient'] })
+    },
+    onError: () => {
+      toast.error(`Error updating user`)
+    },
+  })
+  return {
+    isPending,
+    error,
+    updateUserProfile,
   }
 }

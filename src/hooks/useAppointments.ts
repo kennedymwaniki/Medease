@@ -46,6 +46,9 @@ export const useCreateAppointment = () => {
       queryClient.invalidateQueries({
         queryKey: ['appointments'],
       })
+      queryClient.invalidateQueries({
+        queryKey: ['patient'],
+      })
     },
   })
 

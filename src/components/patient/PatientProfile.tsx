@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import uploadFile from '@/lib/uploads'
+import { useUpdateUser } from '@/hooks/useUser'
 
 function PatientProfile() {
   const patientId = 1
@@ -20,6 +21,14 @@ function PatientProfile() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
+
+  const { updateUserProfile, isPending } = useUpdateUser()
+
+  if (isPending) {
+    return <div className="text-center">Updating profile...</div>
+  }
+
+  const userId = patientData?.user.id
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -36,13 +45,29 @@ function PatientProfile() {
     setIsUploading(true)
     try {
       // TODO: Implement actual image upload logic here
+
+      const imageUrl =
+        'https://dlskybcztupsdcovqpma.supabase.co/storage/v1/object/public/medease/'
       const formData = new FormData()
       formData.append('image', selectedImage)
 
       console.log('Uploading image:', selectedImage.name)
 
       const data = await uploadFile(formData)
-      console.log('This is the data after upload:', data)
+      console.log(
+        'This is the data after upload, in the form in profile page:',
+        data,
+      )
+      const imageLink = imageUrl + data?.path
+      const imagelink = {
+        imagelink: imageLink,
+      }
+      if (userId) {
+        updateUserProfile({ userId, data: imagelink })
+      } else {
+        console.error('User ID is undefined. Cannot update profile.')
+      }
+      console.log('Image uploaded successfully:', imageLink)
 
       // Reset form after successful upload
       setSelectedImage(null)

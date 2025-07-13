@@ -1,4 +1,5 @@
 import api from './axios'
+import type { UpdateUserDto } from '@/types/types'
 // import type { PaginatedUsersResponse } from '@/types/types'
 
 export const getUsers = async () => {
@@ -16,5 +17,10 @@ export const createUser = async (data: any) => {
 
 export const deleteUser = async (userId: number) => {
   const response = await api.delete(`/users/${userId}`)
+  return response.data
+}
+
+export const updateUser = async (userId: number, data: UpdateUserDto) => {
+  const response = await api.patch(`/users/${userId}`, data)
   return response.data
 }

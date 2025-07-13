@@ -4,8 +4,11 @@ import { z } from 'zod'
 import { Calendar, CheckCircle, Clock, MapPin, Star, User } from 'lucide-react'
 
 // Import your actual hook
+import { toast } from 'sonner'
 import type { Doctor } from '@/types/types'
+import { AppointmentStatus } from '@/types/types'
 import { useDoctors } from '@/hooks/useDoctors'
+import { useCreateAppointment } from '@/hooks/useAppointments'
 
 // Zod schema for appointment form validation
 const appointmentSchema = z.object({
@@ -46,6 +49,8 @@ const AppointmentBooking = () => {
   const [currentStep, setCurrentStep] = useState(1)
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null)
 
+  const { createAppointment } = useCreateAppointment()
+
   const [filters, setFilters] = useState({
     specialization: 'All Specializations',
     experience: 'Any Experience',
@@ -68,11 +73,25 @@ const AppointmentBooking = () => {
         return
       }
 
-      // Here you would typically make an API call to book the appointment
       console.log('Booking appointment:', {
         doctor: selectedDoctor,
         appointmentData: value,
       })
+
+      console.log(selectedDoctor?.id, 'selected doctor ID')
+
+      const appointmentData = {
+        doctorId: Number(selectedDoctor?.id),
+        patientId: 1,
+        time: value.time,
+        date: value.date,
+        status: AppointmentStatus.PENDING,
+        duration: value.duration,
+        title: value.appointmentType,
+      }
+
+      createAppointment(appointmentData)
+      toast.success('Appointment booked successfully!')
 
       alert('Appointment booked successfully!')
 

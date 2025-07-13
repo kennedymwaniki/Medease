@@ -48,17 +48,17 @@ function RouteComponent() {
       url: '/patient/profile',
       icon: <FaUser />,
     },
-    {
-      label: 'Help & Support',
-      url: '/patient/help',
-      icon: <FaQuestionCircle />,
-    },
+    // {
+    //   label: 'Help & Support',
+    //   url: '/patient/help',
+    //   icon: <FaQuestionCircle />,
+    // },
   ]
 
   return (
     <div className="flex">
       <SideNavigation navItems={navItems} />
-      <div className="flex-1">
+      <div className="flex-1 p-8 max-w-9xl mx-auto">
         <Outlet />
       </div>
     </div>

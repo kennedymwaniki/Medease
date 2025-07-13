@@ -56,7 +56,7 @@ const PatientStatCard: React.FC = () => {
   ]
 
   return (
-    <div className="flex gap-4 p-4">
+    <div className="flex gap-4 p-2">
       {statData.map((stat, index) => (
         <div
           key={index}

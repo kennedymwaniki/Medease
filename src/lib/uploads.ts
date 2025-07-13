@@ -19,6 +19,8 @@ function generateRandomImageName(originalFileName?: string): string {
 }
 
 async function uploadFile(file: any) {
+  const imageUrl =
+    'https://dlskybcztupsdcovqpma.supabase.co/storage/v1/object/public/medease/'
   const randomFileName = generateRandomImageName(file.name)
   const { data, error } = await supabase.storage
     .from('medease')
@@ -34,6 +36,8 @@ async function uploadFile(file: any) {
     toast.success(`File uploaded successfully: ${data.fullPath}`, {
       position: 'top-right',
     })
+    console.log('This is the response from supabase upload:', data)
+    console.log('This is the image URL:', imageUrl + data.path)
     return data
   }
 }

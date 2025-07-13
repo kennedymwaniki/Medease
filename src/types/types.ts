@@ -145,6 +145,7 @@ export interface CreateUserDto {
   password: string
   role: UserRole
   firstname: string
+  imagelink?: string | null
   lastname: string
   otp?: string
   secret?: string

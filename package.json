@@ -13,6 +13,7 @@
     "check": "prettier --write . && eslint --fix"
   },
   "dependencies": {
+    "@ai-sdk/react": "^1.2.12",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
@@ -32,7 +33,7 @@
     "@radix-ui/react-toggle": "^1.1.9",
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
-    "@stream-io/video-react-sdk": "^1.18.11",
+    "@stream-io/video-react-sdk": "^1.18.12",
     "@supabase/supabase-js": "^2.50.3",
     "@tabler/icons-react": "^3.34.0",
     "@tailwindcss/vite": "^4.0.6",
@@ -46,7 +47,9 @@
     "@tanstack/react-table": "^8.21.2",
     "@tanstack/router-plugin": "^1.121.2",
     "@tanstack/store": "^0.7.0",
+    "@videosdk.live/react-sdk": "^0.3.11",
     "axios": "^1.10.0",
+    "chatbot-widget-ui": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "input-otp": "^1.4.2",
@@ -55,6 +58,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
+    "react-player": "^3.2.0",
     "recharts": "^3.0.2",
     "sonner": "^2.0.5",
     "stream-chat": "^9.10.1",
@@ -63,7 +67,10 @@
     "tailwindcss": "^4.0.6",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
-    "zod": "^3.24.2"
+    "zod": "^3.24.2",
+    "@azure-rest/ai-inference": "latest",
+    "@azure/core-auth": "latest",
+    "@azure/core-sse": "latest"
   },
   "devDependencies": {
     "@tanstack/eslint-config": "^0.1.0",
