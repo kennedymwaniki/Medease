@@ -53,7 +53,7 @@ const App = () => {
         messages={messages}
         primaryColor="#3498db"
         inputMsgPlaceholder="Type your message..."
-        chatbotName="Customer Support"
+        chatbotName="Medease assistant"
         isTypingMessage="Typing..."
         IncommingErrMsg="Oops! Something went wrong. Try again."
         chatIcon={<div>O</div>}

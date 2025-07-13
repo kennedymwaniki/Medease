@@ -14,6 +14,7 @@ import {
   FaUsers,
 } from 'react-icons/fa'
 import AdminSideNavigation from '@/components/AdminSideNavigation'
+// import App from '@/components/App'
 
 export const Route = createFileRoute('/admin')({
   component: RouteComponent,
@@ -104,6 +105,7 @@ function RouteComponent() {
       <div className="flex-1">
         <Outlet />
       </div>
+      {/* <App /> */}
     </div>
   )
 }

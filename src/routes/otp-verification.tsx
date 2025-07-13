@@ -1,6 +1,6 @@
 // import OtpVerificationForm from '@/components/forms/OtpVerificationForm'
 import { createFileRoute } from '@tanstack/react-router'
-import OtpVerificationForm2 from '@/components/forms/OtpVerificationForm2'
+import OtpVerificationForm2 from '@/components/patient/forms/OtpVerificationForm2'
 
 export const Route = createFileRoute('/otp-verification')({
   component: RouteComponent,
