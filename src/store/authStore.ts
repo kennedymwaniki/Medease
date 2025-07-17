@@ -1,31 +1,57 @@
-import { Store } from '@tanstack/store'
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import type { AuthResponse, User } from '@/types/types'
 
-const initialState = {
-  isAuthenticated: false,
-  user: null,
-  token: null,
+interface AuthState {
+  isAuthenticated: boolean
+  user: User | null
+  accessToken: string | null
+  refreshToken: string | null
+  // Actions
+  setUser: (data: AuthResponse) => void
+  clearUser: () => void
+  updateUser: (userData: Partial<User>) => void
 }
 
-const authStore = new Store({
-  initialState,
-})
-export const authctions = {
-  setUser: (data: any) => {
-    authStore.setState((state) => ({
-      ...state,
-      isAuthenticated: true,
-      user: data.user,
-      token: data.token,
-    }))
-    localStorage.setItem('auth', JSON.stringify(data))
-  },
-  clearUser: () => {
-    authStore.setState((state) => ({
-      ...state,
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      // Initial state
       isAuthenticated: false,
       user: null,
-      token: null,
-    }))
-    localStorage.removeItem('auth')
-  },
-}
+      accessToken: null,
+      refreshToken: null,
+
+      // Actions
+      setUser: (data: AuthResponse) =>
+        set({
+          isAuthenticated: true,
+          user: data.user,
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        }),
+
+      clearUser: () =>
+        set({
+          isAuthenticated: false,
+          user: null,
+          accessToken: null,
+          refreshToken: null,
+        }),
+
+      updateUser: (userData: Partial<User>) =>
+        set((state) => ({
+          user: state.user ? { ...state.user, ...userData } : null,
+        })),
+    }),
+    {
+      name: 'auth-storage', // localStorage key
+      partialize: (state) => ({
+        isAuthenticated: state.isAuthenticated,
+        user: state.user,
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+      }),
+    },
+  ),
+)

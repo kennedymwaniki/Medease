@@ -1,6 +1,7 @@
 import React from 'react'
 import { Activity, Bell, Calendar, Pill } from 'lucide-react'
 import { usePatient } from '@/hooks/usePatients'
+import { useAuthStore } from '@/store/authStore'
 
 interface StatCardData {
   icon: React.ReactNode
@@ -12,8 +13,10 @@ interface StatCardData {
 }
 
 const PatientStatCard: React.FC = () => {
-  // const {data: patientData, isLoading, error} = usePatient(patientId)
-  const patientId = 1
+  const user = useAuthStore((state) => state.user)
+
+  console.log('User from auth store:', user)
+  const patientId = Number(user?.patient?.id)
   const { data: patientData, isLoading, error } = usePatient(patientId)
   console.log('Patient Data:', patientData)
 

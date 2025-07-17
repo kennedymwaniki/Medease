@@ -8,33 +8,27 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, Plus } from 'lucide-react'
 import type {
   ColumnFiltersState,
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
-import { usePatient } from '@/hooks/usePatients'
+import { useDoctor } from '@/hooks/useDoctors'
 import { useAuthStore } from '@/store/authStore'
+import Modal from '@/components/Modal'
+import DoctorAppointmentForm from '@/components/Doctors/DoctorAppointmentForm'
 
-interface PatientPrescription {
+interface DoctorAppointment {
   id: number
-  medicationName: string
-  dosage: string
-  frequency: string
+  date: string
+  time: string
   status: string
-  startDate: Date
-  endDate: Date
+  duration: number
+  title: string
 }
 
-const PatientPrescriptionTable: React.FC = () => {
-  const user = useAuthStore((state) => state.user)
-
-  console.log('User from auth store:', user)
-  const patientId = Number(user?.patient?.id)
-  const { data: patientData, isLoading, error } = usePatient(patientId)
-  console.log('Patient Data for prescriptions:', patientData)
-
+const DoctorAppointmentsTable: React.FC = () => {
   const [search, setSearch] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -42,39 +36,41 @@ const PatientPrescriptionTable: React.FC = () => {
     pageIndex: 0,
     pageSize: 10,
   })
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const columnHelper = createColumnHelper<PatientPrescription>()
+  const user = useAuthStore((state) => state.user)
+
+  console.log('User from auth store:', user)
+  const doctorId = Number(user?.doctor?.id)
+
+  const { data: doctorData, isLoading, error, refetch } = useDoctor(doctorId)
+  console.log('Doctor Data with appointments:', doctorData)
+
+  const columnHelper = createColumnHelper<DoctorAppointment>()
 
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
         header: 'ID',
         cell: (info) => info.getValue(),
-        size: 80,
+        size: 50,
       }),
-      columnHelper.accessor('medicationName', {
-        header: 'Medication',
-        cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span className="font-medium text-gray-900">{info.getValue()}</span>
-          </div>
-        ),
+      columnHelper.accessor('date', {
+        header: 'Date',
+        cell: (info) => {
+          const date = new Date(info.getValue())
+          return (
+            <div className="max-w-xs truncate" title={date.toDateString()}>
+              {date.toLocaleDateString()}
+            </div>
+          )
+        },
       }),
-      columnHelper.accessor('dosage', {
-        header: 'Dosage',
+      columnHelper.accessor('time', {
+        header: 'Time',
         cell: (info) => (
           <div className="max-w-xs truncate" title={info.getValue()}>
             <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-              {info.getValue()}
-            </span>
-          </div>
-        ),
-      }),
-      columnHelper.accessor('frequency', {
-        header: 'Frequency',
-        cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
               {info.getValue()}
             </span>
           </div>
@@ -86,14 +82,14 @@ const PatientPrescriptionTable: React.FC = () => {
           <div className="max-w-xs truncate" title={info.getValue()}>
             <span
               className={`px-2 py-1 rounded-full text-xs font-medium ${
-                info.getValue().toLowerCase() === 'active'
+                info.getValue().toLowerCase() === 'confirmed'
                   ? 'bg-green-100 text-green-800'
-                  : info.getValue().toLowerCase() === 'completed'
-                    ? 'bg-blue-100 text-blue-800'
+                  : info.getValue().toLowerCase() === 'pending'
+                    ? 'bg-yellow-100 text-yellow-800'
                     : info.getValue().toLowerCase() === 'cancelled'
                       ? 'bg-red-100 text-red-800'
-                      : info.getValue().toLowerCase() === 'paused'
-                        ? 'bg-yellow-100 text-yellow-800'
+                      : info.getValue().toLowerCase() === 'completed'
+                        ? 'bg-blue-100 text-blue-800'
                         : 'bg-gray-100 text-gray-800'
               }`}
             >
@@ -102,27 +98,26 @@ const PatientPrescriptionTable: React.FC = () => {
           </div>
         ),
       }),
-      columnHelper.accessor('startDate', {
-        header: 'Start Date',
-        cell: (info) => {
-          const date = new Date(info.getValue())
-          return (
-            <div className="max-w-xs truncate" title={date.toDateString()}>
-              {date.toLocaleDateString()}
-            </div>
-          )
-        },
+      columnHelper.accessor('duration', {
+        header: 'Duration',
+        cell: (info) => (
+          <div
+            className="max-w-xs truncate"
+            title={`${info.getValue()} minutes`}
+          >
+            <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+              {info.getValue()} min
+            </span>
+          </div>
+        ),
       }),
-      columnHelper.accessor('endDate', {
-        header: 'End Date',
-        cell: (info) => {
-          const date = new Date(info.getValue())
-          return (
-            <div className="max-w-xs truncate" title={date.toDateString()}>
-              {date.toLocaleDateString()}
-            </div>
-          )
-        },
+      columnHelper.accessor('title', {
+        header: 'Appointment Type',
+        cell: (info) => (
+          <div className="max-w-md truncate" title={info.getValue()}>
+            <span className="font-medium">{info.getValue()}</span>
+          </div>
+        ),
       }),
     ],
     [columnHelper],
@@ -135,22 +130,17 @@ const PatientPrescriptionTable: React.FC = () => {
       const rowData = row.original
 
       return (
-        rowData.medicationName?.toLowerCase().includes(searchValue) ||
-        rowData.dosage?.toLowerCase().includes(searchValue) ||
-        rowData.frequency?.toLowerCase().includes(searchValue) ||
+        rowData.title?.toLowerCase().includes(searchValue) ||
         rowData.status?.toLowerCase().includes(searchValue) ||
+        rowData.date?.toLowerCase().includes(searchValue) ||
+        rowData.time?.toLowerCase().includes(searchValue) ||
         rowData.id?.toString().includes(searchValue)
       )
     }
   }, [])
 
   const table = useReactTable({
-    data:
-      patientData?.prescriptions.map((prescription) => ({
-        ...prescription,
-        startDate: prescription.startDate,
-        endDate: new Date(prescription.endDate),
-      })) || [],
+    data: doctorData?.appointments || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -169,16 +159,24 @@ const PatientPrescriptionTable: React.FC = () => {
     onGlobalFilterChange: setSearch,
   })
 
+  const handleAppointmentSuccess = (appointmentDetails: any) => {
+    console.log('Appointment scheduled successfully:', appointmentDetails)
+    // Close the modal
+    setIsModalOpen(false)
+    // Refetch the doctor data to update the appointments list
+    refetch()
+  }
+
   if (isLoading) {
     return (
-      <div className="p-4 text-blue-600">Loading patient prescriptions...</div>
+      <div className="p-4 text-blue-600">Loading doctor appointments...</div>
     )
   }
 
   if (error) {
     return (
       <div className="p-4 text-red-600">
-        Error fetching patient prescriptions: {error.message}
+        Error fetching doctor appointments: {error.message}
       </div>
     )
   }
@@ -187,24 +185,63 @@ const PatientPrescriptionTable: React.FC = () => {
     setSearch(event.target.value)
   }
 
+  // Calculate appointment statistics
+  const totalAppointments = doctorData?.appointments.length || 0
+  const confirmedAppointments =
+    doctorData?.appointments.filter((apt) => apt.status === 'confirmed')
+      .length || 0
+  const pendingAppointments =
+    doctorData?.appointments.filter((apt) => apt.status === 'pending').length ||
+    0
+
   return (
     <div className="p-4">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">
-          Patient Prescriptions
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          My Appointments
         </h2>
-        <label
-          htmlFor="search"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Search Prescriptions:
-        </label>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">
+              {totalAppointments}
+            </div>
+            <p className="text-sm text-blue-600">Total Appointments</p>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-green-600">
+              {confirmedAppointments}
+            </div>
+            <p className="text-sm text-green-600">Confirmed</p>
+          </div>
+          <div className="bg-yellow-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-yellow-600">
+              {pendingAppointments}
+            </div>
+            <p className="text-sm text-yellow-600">Pending</p>
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center mb-2">
+          <label
+            htmlFor="search"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Search Appointments:
+          </label>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Schedule Appointment</span>
+          </button>
+        </div>
         <input
           id="search"
           type="text"
           value={search}
           onChange={handleSearch}
-          placeholder="Search by medication, dosage, frequency, or status..."
+          placeholder="Search by appointment type, date, time, or status..."
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
@@ -279,16 +316,16 @@ const PatientPrescriptionTable: React.FC = () => {
 
       {table.getRowModel().rows.length === 0 && (
         <div className="text-center py-8 text-gray-500">
-          No prescriptions found matching your search.
+          No appointments found matching your search.
         </div>
       )}
 
       <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div className="text-sm text-gray-500">
           Showing {table.getRowModel().rows.length} of{' '}
-          {table.getPrePaginationRowModel().rows.length} prescriptions
+          {table.getPrePaginationRowModel().rows.length} appointments
           {search &&
-            ` (filtered from ${patientData?.prescriptions.length || 0} total)`}
+            ` (filtered from ${doctorData?.appointments.length || 0} total)`}
         </div>
 
         <div className="flex items-center gap-2">
@@ -331,8 +368,20 @@ const PatientPrescriptionTable: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Modal for Doctor Appointment Form */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Schedule New Appointment"
+        size="full"
+      >
+        <DoctorAppointmentForm
+          onAppointmentSuccess={handleAppointmentSuccess}
+        />
+      </Modal>
     </div>
   )
 }
 
-export default PatientPrescriptionTable
+export default DoctorAppointmentsTable

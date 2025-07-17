@@ -1,13 +1,19 @@
 import { useState } from 'react'
 import {
+  Building,
   Calendar,
   Camera,
-  MapPin,
+  CheckCircle,
+  Clock,
+  Phone,
+  Shield,
+  Stethoscope,
   Upload,
   User,
   UserCircle,
+  XCircle,
 } from 'lucide-react'
-import { usePatient } from '@/hooks/usePatients'
+import { useDoctor } from '@/hooks/useDoctors'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -16,32 +22,25 @@ import uploadFile from '@/lib/uploads'
 import { useUpdateUser } from '@/hooks/useUser'
 import { useAuthStore } from '@/store/authStore'
 
-function PatientProfile() {
-  // Using Zustand store
-  // const { user } = useAuthStore((state) => ({
-  //   user: state.user,
-  // }))
+const DoctorProfile = () => {
   const user = useAuthStore((state) => state.user)
+  const doctorId = user?.doctor?.id
 
-  console.log('User from auth store:', user)
-
-  const patientId = user?.patient?.id
-
-  const { data: patientData, isLoading, error } = usePatient(patientId!)
+  const { data: doctorData, isLoading, error } = useDoctor(doctorId!)
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
 
   const { updateUserProfile, isPending } = useUpdateUser()
 
-  console.log('Ths is the patientData', patientData)
+  console.log('Doctor data:', doctorData)
 
   if (isPending) {
     return <div className="text-center">Updating profile...</div>
   }
 
-  const userId = patientData?.user.id
-  console.log('This is the user id of the patient', userId)
+  const userId = doctorData?.user.id
+  console.log('User ID of the doctor:', userId)
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -65,26 +64,24 @@ function PatientProfile() {
       console.log('Uploading image:', selectedImage.name)
 
       const data = await uploadFile(formData)
-      console.log(
-        'This is the data after upload, in the form in profile page:',
-        data,
-      )
+      console.log('Upload data:', data)
+
       const imageLink = imageUrl + data?.path
       const imagelink = {
         imagelink: imageLink,
       }
+
       if (userId) {
         updateUserProfile({ userId, data: imagelink })
       } else {
         console.error('User ID is undefined. Cannot update profile.')
       }
+
       console.log('Image uploaded successfully:', imageLink)
 
       // Reset form after successful upload
       setSelectedImage(null)
       setPreviewUrl(null)
-
-      // TODO: Refetch patient data to get updated image
     } catch (uploadError) {
       console.error('Error uploading image:', uploadError)
     } finally {
@@ -102,7 +99,7 @@ function PatientProfile() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading patient profile...</p>
+          <p className="mt-4 text-gray-600">Loading doctor profile...</p>
         </div>
       </div>
     )
@@ -119,11 +116,11 @@ function PatientProfile() {
     )
   }
 
-  if (!patientData) {
+  if (!doctorData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center text-gray-600">
-          <p className="text-xl font-semibold">Patient not found</p>
+          <p className="text-xl font-semibold">Doctor not found</p>
         </div>
       </div>
     )
@@ -137,27 +134,45 @@ function PatientProfile() {
       .toUpperCase()
   }
 
-  const getGenderColor = (gender: string) => {
-    switch (gender.toLowerCase()) {
-      case 'male':
-        return 'bg-blue-100 text-blue-800'
-      case 'female':
-        return 'bg-pink-100 text-pink-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
+  const getAvailabilityColor = (isAvailable: boolean) => {
+    return isAvailable
+      ? 'bg-green-100 text-green-800'
+      : 'bg-red-100 text-red-800'
   }
 
+  const getSpecializationColor = (specialization: string) => {
+    const colors = {
+      cardiology: 'bg-red-100 text-red-800',
+      neurology: 'bg-purple-100 text-purple-800',
+      orthopedics: 'bg-blue-100 text-blue-800',
+      pediatrics: 'bg-pink-100 text-pink-800',
+      dermatology: 'bg-yellow-100 text-yellow-800',
+      psychiatry: 'bg-indigo-100 text-indigo-800',
+      general: 'bg-gray-100 text-gray-800',
+    }
+
+    const key = specialization.toLowerCase()
+    return colors[key as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+  }
+
+  // Get confirmed and pending appointments
+  const confirmedAppointments = doctorData.appointments.filter(
+    (apt) => apt.status === 'confirmed',
+  )
+  const pendingAppointments = doctorData.appointments.filter(
+    (apt) => apt.status === 'pending',
+  )
+
   return (
-    <div className=" mx-auto px-4 py-2 max-w-7xl">
+    <div className="mx-auto px-4 py-2 max-w-7xl">
       <div className="space-y-6 grid grid-cols-2 gap-8">
         <div>
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Patient Profile
+              Doctor Profile
             </h1>
             <p className="text-gray-600">
-              Manage your personal information and profile picture
+              Manage your professional information and profile picture
             </p>
           </div>
 
@@ -172,18 +187,24 @@ function PatientProfile() {
               <div className="mb-6">
                 <Avatar className="h-32 w-32 mx-auto mb-4">
                   <AvatarImage
-                    src={patientData.user.imagelink || undefined}
-                    alt={patientData.name}
+                    src={doctorData.user.imagelink || undefined}
+                    alt={
+                      doctorData.user.firstname + ' ' + doctorData.user.lastname
+                    }
                   />
                   <AvatarFallback className="text-2xl">
-                    {patientData.user.imagelink ? (
+                    {doctorData.user.imagelink ? (
                       <UserCircle className="h-16 w-16" />
                     ) : (
-                      getInitials(patientData.name)
+                      getInitials(
+                        doctorData.user.firstname +
+                          ' ' +
+                          doctorData.user.lastname,
+                      )
                     )}
                   </AvatarFallback>
                 </Avatar>
-                {!patientData.user.imagelink && (
+                {!doctorData.user.imagelink && (
                   <p className="text-sm text-gray-500">
                     No profile picture uploaded
                   </p>
@@ -253,12 +274,12 @@ function PatientProfile() {
           </Card>
         </div>
 
-        {/* Personal Information */}
+        {/* Professional Information */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Personal Information
+              <Stethoscope className="h-5 w-5" />
+              Professional Information
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -271,30 +292,60 @@ function PatientProfile() {
                 <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
                   <User className="h-4 w-4 text-gray-500" />
                   <span className="text-gray-900 font-medium">
-                    {patientData.name}
+                    {doctorData.user.firstname} {doctorData.user.lastname}
                   </span>
                 </div>
               </div>
 
-              {/* Age */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Age</label>
-                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                  <Calendar className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-900">
-                    {patientData.age} years old
-                  </span>
-                </div>
-              </div>
-
-              {/* Gender */}
+              {/* Specialization */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">
-                  Gender
+                  Specialization
                 </label>
                 <div className="flex items-center gap-2">
-                  <Badge className={getGenderColor(patientData.gender)}>
-                    {patientData.gender}
+                  <Badge
+                    className={getSpecializationColor(
+                      doctorData.specialization,
+                    )}
+                  >
+                    {doctorData.specialization}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Experience */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Experience
+                </label>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                  <Clock className="h-4 w-4 text-gray-500" />
+                  <span className="text-gray-900">
+                    {doctorData.experience} years
+                  </span>
+                </div>
+              </div>
+
+              {/* Availability */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Availability
+                </label>
+                <div className="flex items-center gap-2">
+                  <Badge
+                    className={getAvailabilityColor(doctorData.isAvailable)}
+                  >
+                    {doctorData.isAvailable ? (
+                      <>
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Available
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="h-3 w-3 mr-1" />
+                        Unavailable
+                      </>
+                    )}
                   </Badge>
                 </div>
               </div>
@@ -305,19 +356,21 @@ function PatientProfile() {
                   Contact
                 </label>
                 <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-900">{patientData.contact}</span>
+                  <Phone className="h-4 w-4 text-gray-500" />
+                  <span className="text-gray-900">{doctorData.contact}</span>
                 </div>
               </div>
 
-              {/* Address */}
-              <div className="space-y-2 md:col-span-2">
+              {/* Affiliation */}
+              <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">
-                  Address
+                  Affiliation
                 </label>
-                <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
-                  <MapPin className="h-4 w-4 text-gray-500 mt-0.5" />
-                  <span className="text-gray-900">{patientData.address}</span>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                  <Building className="h-4 w-4 text-gray-500" />
+                  <span className="text-gray-900">
+                    {doctorData.affiliation}
+                  </span>
                 </div>
               </div>
             </div>
@@ -340,9 +393,7 @@ function PatientProfile() {
                   Email
                 </label>
                 <div className="p-3 bg-gray-50 rounded-lg">
-                  <span className="text-gray-900">
-                    {patientData.user.email}
-                  </span>
+                  <span className="text-gray-900">{doctorData.user.email}</span>
                 </div>
               </div>
 
@@ -353,7 +404,7 @@ function PatientProfile() {
                 </label>
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <span className="text-gray-900">
-                    {patientData.user.firstname}
+                    {doctorData.user.firstname}
                   </span>
                 </div>
               </div>
@@ -365,7 +416,7 @@ function PatientProfile() {
                 </label>
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <span className="text-gray-900">
-                    {patientData.user.lastname}
+                    {doctorData.user.lastname}
                   </span>
                 </div>
               </div>
@@ -377,7 +428,8 @@ function PatientProfile() {
                 </label>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="capitalize">
-                    {patientData.user.role}
+                    <Shield className="h-3 w-3 mr-1" />
+                    {doctorData.user.role}
                   </Badge>
                 </div>
               </div>
@@ -386,11 +438,11 @@ function PatientProfile() {
         </Card>
 
         {/* Quick Stats */}
-        <div className="grid md:grid-cols-3 gap-2">
+        <div className="grid md:grid-cols-3 gap-4">
           <Card>
             <CardContent className="p-6 text-center">
               <div className="text-2xl font-bold text-blue-600">
-                {patientData.appointments.length}
+                {doctorData.appointments.length}
               </div>
               <p className="text-sm text-gray-600">Total Appointments</p>
             </CardContent>
@@ -399,18 +451,18 @@ function PatientProfile() {
           <Card>
             <CardContent className="p-6 text-center">
               <div className="text-2xl font-bold text-green-600">
-                {patientData.prescriptions.length}
+                {confirmedAppointments.length}
               </div>
-              <p className="text-sm text-gray-600">Active Prescriptions</p>
+              <p className="text-sm text-gray-600">Confirmed Appointments</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardContent className="p-6 text-center">
-              <div className="text-2xl font-bold text-purple-600">
-                {patientData.medicalHistories.length}
+              <div className="text-2xl font-bold text-orange-600">
+                {pendingAppointments.length}
               </div>
-              <p className="text-sm text-gray-600">Medical Records</p>
+              <p className="text-sm text-gray-600">Pending Appointments</p>
             </CardContent>
           </Card>
         </div>
@@ -419,4 +471,4 @@ function PatientProfile() {
   )
 }
 
-export default PatientProfile
+export default DoctorProfile

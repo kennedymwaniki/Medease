@@ -14,27 +14,21 @@ import type {
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
-import { usePatient } from '@/hooks/usePatients'
+import type { Doctor } from '@/types/types'
+import { useDoctor } from '@/hooks/useDoctors'
 import { useAuthStore } from '@/store/authStore'
 
-interface PatientPrescription {
+interface DoctorPrescription {
   id: number
+  frequency: string
   medicationName: string
   dosage: string
-  frequency: string
   status: string
-  startDate: Date
-  endDate: Date
+  startDate: string
+  endDate: string
 }
 
-const PatientPrescriptionTable: React.FC = () => {
-  const user = useAuthStore((state) => state.user)
-
-  console.log('User from auth store:', user)
-  const patientId = Number(user?.patient?.id)
-  const { data: patientData, isLoading, error } = usePatient(patientId)
-  console.log('Patient Data for prescriptions:', patientData)
-
+const DoctorPrescriptionsTable: React.FC = () => {
   const [search, setSearch] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -43,19 +37,27 @@ const PatientPrescriptionTable: React.FC = () => {
     pageSize: 10,
   })
 
-  const columnHelper = createColumnHelper<PatientPrescription>()
+  const user = useAuthStore((state) => state.user)
+
+  console.log('User from auth store:', user)
+  const doctorId = Number(user?.doctor?.id)
+
+  const { data: doctorData, isLoading, error } = useDoctor(doctorId)
+  console.log('Doctor Data:', doctorData)
+
+  const columnHelper = createColumnHelper<DoctorPrescription>()
 
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
         header: 'ID',
         cell: (info) => info.getValue(),
-        size: 80,
+        size: 50,
       }),
       columnHelper.accessor('medicationName', {
-        header: 'Medication',
+        header: 'Medication Name',
         cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
+          <div className="max-w-md truncate" title={info.getValue()}>
             <span className="font-medium text-gray-900">{info.getValue()}</span>
           </div>
         ),
@@ -74,7 +76,7 @@ const PatientPrescriptionTable: React.FC = () => {
         header: 'Frequency',
         cell: (info) => (
           <div className="max-w-xs truncate" title={info.getValue()}>
-            <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
               {info.getValue()}
             </span>
           </div>
@@ -92,9 +94,9 @@ const PatientPrescriptionTable: React.FC = () => {
                     ? 'bg-blue-100 text-blue-800'
                     : info.getValue().toLowerCase() === 'cancelled'
                       ? 'bg-red-100 text-red-800'
-                      : info.getValue().toLowerCase() === 'paused'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
+                      : info.getValue().toLowerCase() === 'expired'
+                        ? 'bg-gray-100 text-gray-800'
+                        : 'bg-yellow-100 text-yellow-800'
               }`}
             >
               {info.getValue()}
@@ -144,13 +146,24 @@ const PatientPrescriptionTable: React.FC = () => {
     }
   }, [])
 
-  const table = useReactTable({
-    data:
-      patientData?.prescriptions.map((prescription) => ({
+  const transformedData = useMemo(() => {
+    return (
+      doctorData?.prescriptions.map((prescription) => ({
         ...prescription,
-        startDate: prescription.startDate,
-        endDate: new Date(prescription.endDate),
-      })) || [],
+        startDate:
+          prescription.startDate instanceof Date
+            ? prescription.startDate.toISOString()
+            : prescription.startDate,
+        endDate:
+          prescription.endDate instanceof Date
+            ? prescription.endDate.toISOString()
+            : prescription.endDate,
+      })) || []
+    )
+  }, [doctorData?.prescriptions])
+
+  const table = useReactTable({
+    data: transformedData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -171,14 +184,14 @@ const PatientPrescriptionTable: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="p-4 text-blue-600">Loading patient prescriptions...</div>
+      <div className="p-4 text-blue-600">Loading doctor prescriptions...</div>
     )
   }
 
   if (error) {
     return (
       <div className="p-4 text-red-600">
-        Error fetching patient prescriptions: {error.message}
+        Error fetching doctor prescriptions: {error.message}
       </div>
     )
   }
@@ -187,12 +200,44 @@ const PatientPrescriptionTable: React.FC = () => {
     setSearch(event.target.value)
   }
 
+  // Calculate prescription statistics
+  const totalPrescriptions = doctorData?.prescriptions.length || 0
+  const activePrescriptions =
+    doctorData?.prescriptions.filter(
+      (prescription) => prescription.status === 'active',
+    ).length || 0
+  const completedPrescriptions =
+    doctorData?.prescriptions.filter(
+      (prescription) => prescription.status === 'completed',
+    ).length || 0
+
   return (
     <div className="p-4">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">
-          Patient Prescriptions
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Your issued Prescriptions
         </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">
+              {totalPrescriptions}
+            </div>
+            <p className="text-sm text-blue-600">Total Prescriptions</p>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-green-600">
+              {activePrescriptions}
+            </div>
+            <p className="text-sm text-green-600">Active</p>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-gray-600">
+              {completedPrescriptions}
+            </div>
+            <p className="text-sm text-gray-600">Completed</p>
+          </div>
+        </div>
+
         <label
           htmlFor="search"
           className="block text-sm font-medium text-gray-700 mb-2"
@@ -204,7 +249,7 @@ const PatientPrescriptionTable: React.FC = () => {
           type="text"
           value={search}
           onChange={handleSearch}
-          placeholder="Search by medication, dosage, frequency, or status..."
+          placeholder="Search by medication name, dosage, frequency, or status..."
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
@@ -288,7 +333,7 @@ const PatientPrescriptionTable: React.FC = () => {
           Showing {table.getRowModel().rows.length} of{' '}
           {table.getPrePaginationRowModel().rows.length} prescriptions
           {search &&
-            ` (filtered from ${patientData?.prescriptions.length || 0} total)`}
+            ` (filtered from ${doctorData?.prescriptions.length || 0} total)`}
         </div>
 
         <div className="flex items-center gap-2">
@@ -335,4 +380,4 @@ const PatientPrescriptionTable: React.FC = () => {
   )
 }
 
-export default PatientPrescriptionTable
+export default DoctorPrescriptionsTable

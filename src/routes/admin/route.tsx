@@ -9,6 +9,7 @@ import {
   FaHome,
   FaPills,
   FaPrescriptionBottleAlt,
+  FaSignOutAlt,
   FaUserCog,
   FaUserMd,
   FaUsers,
@@ -25,18 +26,18 @@ function RouteComponent() {
     { label: 'Dashboard', url: '/admin/', icon: <FaHome />, category: 'main' },
 
     // User Management
-    {
-      label: 'Doctors',
-      url: '/admin/doctors',
-      icon: <FaUserMd />,
-      category: 'User Management',
-    },
-    {
-      label: 'Patients',
-      url: '/admin/patients',
-      icon: <FaUsers />,
-      category: 'User Management',
-    },
+    // {
+    //   label: 'Doctors',
+    //   url: '/admin/doctors',
+    //   icon: <FaUserMd />,
+    //   category: 'User Management',
+    // },
+    // {
+    //   label: 'Patients',
+    //   url: '/admin/patients',
+    //   icon: <FaUsers />,
+    //   category: 'User Management',
+    // },
     {
       label: 'System Users',
       url: '/admin/users',
@@ -63,18 +64,18 @@ function RouteComponent() {
       icon: <FaPrescriptionBottleAlt />,
       category: 'Operations',
     },
-    {
-      label: 'Medical Records',
-      url: '/admin/medical-records',
-      icon: <FaFileAlt />,
-      category: 'Operations',
-    },
-    {
-      label: 'Payments',
-      url: '/admin/payments',
-      icon: <FaCreditCard />,
-      category: 'Operations',
-    },
+    // {
+    //   label: 'Medical Records',
+    //   url: '/admin/medical-records',
+    //   icon: <FaFileAlt />,
+    //   category: 'Operations',
+    // },
+    // {
+    //   label: 'Payments',
+    //   url: '/admin/payments',
+    //   icon: <FaCreditCard />,
+    //   category: 'Operations',
+    // },
     {
       label: 'Reports',
       url: '/admin/reports',
@@ -93,6 +94,13 @@ function RouteComponent() {
       label: 'Settings',
       url: '/admin/settings',
       icon: <FaCog />,
+      category: 'System',
+    },
+    // logout
+    {
+      label: 'Logout',
+      url: '/admin/logout',
+      icon: <FaSignOutAlt />,
       category: 'System',
     },
   ]

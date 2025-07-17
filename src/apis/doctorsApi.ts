@@ -1,5 +1,5 @@
 import api from './axios'
-import type { Doctor } from '@/types/types'
+import type { Doctor, DoctorTimeSlot } from '@/types/types'
 // import type { PaginatedUsersResponse } from '@/types/types'
 
 export const getDoctors = async (): Promise<Array<Doctor>> => {
@@ -17,5 +17,13 @@ export const createDoctor = async (data: any) => {
 
 export const deleteDoctor = async (doctorId: number) => {
   const response = await api.delete(`/doctors/${doctorId}`)
+  return response.data
+}
+
+export const getDoctorAvailableSlotTimes = async (
+  doctorId: number,
+  date: string,
+): Promise<Array<DoctorTimeSlot>> => {
+  const response = await api.get(`/doctors/${doctorId}/available-slots/${date}`)
   return response.data
 }

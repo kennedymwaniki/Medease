@@ -1,4 +1,5 @@
 import { usePatient } from '@/hooks/usePatients'
+import { useAuthStore } from '@/store/authStore'
 
 export interface Prescription {
   id: number
@@ -11,7 +12,10 @@ export interface Prescription {
 }
 
 const PatientPrescriptions = () => {
-  const patientId = 1 // Replace with actual patient ID from context or props
+  const user = useAuthStore((state) => state.user)
+
+  console.log('User from auth store:', user)
+  const patientId = Number(user?.patient?.id)
   const { data: patientData, isLoading, error } = usePatient(patientId)
 
   if (isLoading) {

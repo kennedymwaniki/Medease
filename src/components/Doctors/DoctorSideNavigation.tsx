@@ -9,7 +9,7 @@ export interface sideNavItemProps {
   url: string
 }
 
-const SideNavigation = ({
+const DoctorSideNavigation = ({
   navItems,
 }: {
   navItems: Array<sideNavItemProps>
@@ -21,7 +21,7 @@ const SideNavigation = ({
   }
 
   return (
-    <div className="h-screen bg-white/20 shadow-2xl w-64 flex flex-col">
+    <div className="h-screen bg-white/20 shadow-lg w-64 flex flex-col">
       <div className="p-4 flex-1">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10  rounded-lg flex items-center justify-center">
@@ -35,7 +35,7 @@ const SideNavigation = ({
           </div>
           <div>
             <h1 className="text-lg font-semibold text-gray-800">MedEase</h1>
-            <p className="text-sm text-gray-500">Patient Portal</p>
+            <p className="text-sm text-gray-500">Doctor Portal</p>
           </div>
         </div>
 
@@ -79,4 +79,4 @@ const SideNavigation = ({
   )
 }
 
-export default SideNavigation
+export default DoctorSideNavigation

@@ -11,8 +11,8 @@ import {
 export const useMedications = () => {
   const {
     data: medications,
-    // isLoading,
-    isPending,
+    isLoading,
+    isError,
     error,
   } = useQuery({
     queryKey: ['medications'],
@@ -21,8 +21,8 @@ export const useMedications = () => {
 
   return {
     medications,
-    // isLoading,
-    isPending,
+    isLoading,
+    isError,
     error,
   }
 }

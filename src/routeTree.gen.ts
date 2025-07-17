@@ -15,6 +15,8 @@ import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as OtpVerificationRouteImport } from './routes/otp-verification'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DoctorsRouteImport } from './routes/doctors'
+import { Route as ChatsRouteImport } from './routes/chats'
+import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as PatientRouteRouteImport } from './routes/patient/route'
 import { Route as DoctorRouteRouteImport } from './routes/doctor/route'
@@ -43,6 +45,7 @@ import { Route as AdminProfileRouteImport } from './routes/admin/profile'
 import { Route as AdminPrescriptionsRouteImport } from './routes/admin/prescriptions'
 import { Route as AdminPaymentsRouteImport } from './routes/admin/payments'
 import { Route as AdminPatientsRouteImport } from './routes/admin/patients'
+import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
 import { Route as AdminMedicationsRouteImport } from './routes/admin/medications'
 import { Route as AdminDoctorsRouteImport } from './routes/admin/doctors'
 import { Route as AdminAppointmentsRouteImport } from './routes/admin/appointments'
@@ -75,6 +78,16 @@ const LoginRoute = LoginRouteImport.update({
 const DoctorsRoute = DoctorsRouteImport.update({
   id: '/doctors',
   path: '/doctors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatsRoute = ChatsRouteImport.update({
+  id: '/chats',
+  path: '/chats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -217,6 +230,11 @@ const AdminPatientsRoute = AdminPatientsRouteImport.update({
   path: '/patients',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminMedicationsRoute = AdminMedicationsRouteImport.update({
   id: '/medications',
   path: '/medications',
@@ -239,6 +257,8 @@ export interface FileRoutesByFullPath {
   '/doctor': typeof DoctorRouteRouteWithChildren
   '/patient': typeof PatientRouteRouteWithChildren
   '/about': typeof AboutRoute
+  '/chat': typeof ChatRoute
+  '/chats': typeof ChatsRoute
   '/doctors': typeof DoctorsRoute
   '/login': typeof LoginRoute
   '/otp-verification': typeof OtpVerificationRoute
@@ -248,6 +268,7 @@ export interface FileRoutesByFullPath {
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/doctors': typeof AdminDoctorsRoute
   '/admin/medications': typeof AdminMedicationsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/patients': typeof AdminPatientsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/prescriptions': typeof AdminPrescriptionsRoute
@@ -275,6 +296,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/chat': typeof ChatRoute
+  '/chats': typeof ChatsRoute
   '/doctors': typeof DoctorsRoute
   '/login': typeof LoginRoute
   '/otp-verification': typeof OtpVerificationRoute
@@ -284,6 +307,7 @@ export interface FileRoutesByTo {
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/doctors': typeof AdminDoctorsRoute
   '/admin/medications': typeof AdminMedicationsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/patients': typeof AdminPatientsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/prescriptions': typeof AdminPrescriptionsRoute
@@ -315,6 +339,8 @@ export interface FileRoutesById {
   '/doctor': typeof DoctorRouteRouteWithChildren
   '/patient': typeof PatientRouteRouteWithChildren
   '/about': typeof AboutRoute
+  '/chat': typeof ChatRoute
+  '/chats': typeof ChatsRoute
   '/doctors': typeof DoctorsRoute
   '/login': typeof LoginRoute
   '/otp-verification': typeof OtpVerificationRoute
@@ -324,6 +350,7 @@ export interface FileRoutesById {
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/doctors': typeof AdminDoctorsRoute
   '/admin/medications': typeof AdminMedicationsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/patients': typeof AdminPatientsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/prescriptions': typeof AdminPrescriptionsRoute
@@ -356,6 +383,8 @@ export interface FileRouteTypes {
     | '/doctor'
     | '/patient'
     | '/about'
+    | '/chat'
+    | '/chats'
     | '/doctors'
     | '/login'
     | '/otp-verification'
@@ -365,6 +394,7 @@ export interface FileRouteTypes {
     | '/admin/appointments'
     | '/admin/doctors'
     | '/admin/medications'
+    | '/admin/notifications'
     | '/admin/patients'
     | '/admin/payments'
     | '/admin/prescriptions'
@@ -392,6 +422,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/chat'
+    | '/chats'
     | '/doctors'
     | '/login'
     | '/otp-verification'
@@ -401,6 +433,7 @@ export interface FileRouteTypes {
     | '/admin/appointments'
     | '/admin/doctors'
     | '/admin/medications'
+    | '/admin/notifications'
     | '/admin/patients'
     | '/admin/payments'
     | '/admin/prescriptions'
@@ -431,6 +464,8 @@ export interface FileRouteTypes {
     | '/doctor'
     | '/patient'
     | '/about'
+    | '/chat'
+    | '/chats'
     | '/doctors'
     | '/login'
     | '/otp-verification'
@@ -440,6 +475,7 @@ export interface FileRouteTypes {
     | '/admin/appointments'
     | '/admin/doctors'
     | '/admin/medications'
+    | '/admin/notifications'
     | '/admin/patients'
     | '/admin/payments'
     | '/admin/prescriptions'
@@ -471,6 +507,8 @@ export interface RootRouteChildren {
   DoctorRouteRoute: typeof DoctorRouteRouteWithChildren
   PatientRouteRoute: typeof PatientRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
+  ChatRoute: typeof ChatRoute
+  ChatsRoute: typeof ChatsRoute
   DoctorsRoute: typeof DoctorsRoute
   LoginRoute: typeof LoginRoute
   OtpVerificationRoute: typeof OtpVerificationRoute
@@ -521,6 +559,20 @@ declare module '@tanstack/react-router' {
       path: '/doctors'
       fullPath: '/doctors'
       preLoaderRoute: typeof DoctorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chats': {
+      id: '/chats'
+      path: '/chats'
+      fullPath: '/chats'
+      preLoaderRoute: typeof ChatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -719,6 +771,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPatientsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/medications': {
       id: '/admin/medications'
       path: '/medications'
@@ -747,6 +806,7 @@ interface AdminRouteRouteChildren {
   AdminAppointmentsRoute: typeof AdminAppointmentsRoute
   AdminDoctorsRoute: typeof AdminDoctorsRoute
   AdminMedicationsRoute: typeof AdminMedicationsRoute
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminPatientsRoute: typeof AdminPatientsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminPrescriptionsRoute: typeof AdminPrescriptionsRoute
@@ -761,6 +821,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminAppointmentsRoute: AdminAppointmentsRoute,
   AdminDoctorsRoute: AdminDoctorsRoute,
   AdminMedicationsRoute: AdminMedicationsRoute,
+  AdminNotificationsRoute: AdminNotificationsRoute,
   AdminPatientsRoute: AdminPatientsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminPrescriptionsRoute: AdminPrescriptionsRoute,
@@ -831,6 +892,8 @@ const rootRouteChildren: RootRouteChildren = {
   DoctorRouteRoute: DoctorRouteRouteWithChildren,
   PatientRouteRoute: PatientRouteRouteWithChildren,
   AboutRoute: AboutRoute,
+  ChatRoute: ChatRoute,
+  ChatsRoute: ChatsRoute,
   DoctorsRoute: DoctorsRoute,
   LoginRoute: LoginRoute,
   OtpVerificationRoute: OtpVerificationRoute,

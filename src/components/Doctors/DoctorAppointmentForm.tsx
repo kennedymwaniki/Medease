@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useEffect, useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
-import { Calendar, CheckCircle, Clock, Star, User } from 'lucide-react'
+import { Calendar, CheckCircle, Clock, Search, User } from 'lucide-react'
 
-// Import your actual hook
 import { toast } from 'sonner'
-import type { Doctor } from '@/types/types'
+import type { Patient } from '@/types/types'
 import { AppointmentStatus } from '@/types/types'
-import { useDoctors, useGetDoctorAvailableTimes } from '@/hooks/useDoctors'
+import { usePatients } from '@/hooks/usePatients'
+import { useGetDoctorAvailableTimes } from '@/hooks/useDoctors'
 import { useCreateAppointment } from '@/hooks/useAppointments'
 import { useAuthStore } from '@/store/authStore'
 
@@ -26,7 +25,6 @@ const appointmentSchema = z.object({
   time: z
     .string()
     .min(1, 'Time is required')
-    // More flexible regex to handle different time formats
     .regex(
       /^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/,
       'Please select a valid time',
@@ -49,30 +47,22 @@ const validateField = <T,>(value: T, schema: z.ZodType<T>) => {
   return undefined
 }
 
-interface AppointmentBookingProps {
+interface DoctorAppointmentFormProps {
   onAppointmentSuccess?: (appointmentDetails: any) => void
 }
 
-const AppointmentBooking = ({
+const DoctorAppointmentForm = ({
   onAppointmentSuccess,
-}: AppointmentBookingProps) => {
-  const { data: doctors, isLoading, error } = useDoctors()
+}: DoctorAppointmentFormProps) => {
+  const { data: patients, isLoading, error } = usePatients()
   const [currentStep, setCurrentStep] = useState(1)
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null)
-  // Add this state to track the selected date reactively
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
   const [selectedDate, setSelectedDate] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
 
   const { createAppointment } = useCreateAppointment()
-
   const user = useAuthStore((state) => state.user)
-
-  console.log('User from auth store:', user)
-  const patientId = Number(user?.patient?.id)
-  const [filters, setFilters] = useState({
-    specialization: 'All Specializations',
-    experience: 'Any Experience',
-    availability: 'All Availability',
-  })
+  const doctorId = Number(user?.doctor?.id)
 
   const form = useForm({
     defaultValues: {
@@ -82,23 +72,15 @@ const AppointmentBooking = ({
       appointmentType: '',
     } satisfies AppointmentFormData,
     onSubmit: ({ value }) => {
-      // Final validation before submission
       const result = appointmentSchema.safeParse(value)
       if (!result.success) {
         console.error('Validation failed:', result.error.issues)
         return
       }
 
-      console.log('Booking appointment:', {
-        doctor: selectedDoctor,
-        appointmentData: value,
-      })
-
-      console.log(selectedDoctor?.id, 'selected doctor ID')
-
       const appointmentData = {
-        doctorId: Number(selectedDoctor?.id),
-        patientId,
+        doctorId,
+        patientId: Number(selectedPatient?.id),
         time: value.time,
         date: value.date,
         status: AppointmentStatus.PENDING,
@@ -107,12 +89,12 @@ const AppointmentBooking = ({
       }
 
       createAppointment(appointmentData)
-      toast.success('Appointment booked successfully!')
+      toast.success('Appointment scheduled successfully!')
 
       // Call the success callback with appointment details
       if (onAppointmentSuccess) {
         onAppointmentSuccess({
-          doctorName: `${selectedDoctor?.user.firstname} ${selectedDoctor?.user.lastname}`,
+          patientName: selectedPatient?.name,
           date: new Date(value.date).toLocaleDateString(),
           time: new Date(`2000-01-01T${value.time}`).toLocaleTimeString([], {
             hour: 'numeric',
@@ -126,13 +108,11 @@ const AppointmentBooking = ({
 
       // Reset form and go back to step 1
       form.reset()
-      setSelectedDoctor(null)
+      setSelectedPatient(null)
       setCurrentStep(1)
+      setSearchTerm('')
     },
   })
-
-  // Remove this line since we're now using state
-  // const selectedDate = form.getFieldValue('date')
 
   // Fetch available times whenever selectedDate changes
   const {
@@ -140,27 +120,21 @@ const AppointmentBooking = ({
     isLoading: isLoadingAvailableTimes,
     error: availableTimesError,
     refetch: refetchAvailableTimes,
-  } = useGetDoctorAvailableTimes(selectedDoctor?.id ?? 0, selectedDate)
+  } = useGetDoctorAvailableTimes(doctorId, selectedDate)
 
-  // Effect to refetch available times when selectedDate or selectedDoctor changes
+  // Effect to refetch available times when selectedDate changes
   useEffect(() => {
-    if (selectedDate && selectedDoctor?.id) {
-      console.log('Refetching available times for:', {
-        doctorId: selectedDoctor.id,
-        date: selectedDate,
-      })
+    if (selectedDate && doctorId) {
       refetchAvailableTimes()
     }
-  }, [selectedDate, selectedDoctor?.id, refetchAvailableTimes])
+  }, [selectedDate, doctorId, refetchAvailableTimes])
 
   // Subscribe to form changes to keep selectedDate in sync and reset time when date changes
   form.Subscribe({
     selector: (state) => state.values.date,
     children: (currentDate) => {
       if (currentDate !== selectedDate) {
-        console.log('Date changed from', selectedDate, 'to', currentDate)
         setSelectedDate(currentDate)
-        // Reset time when date changes
         form.setFieldValue('time', '')
       }
       return null
@@ -179,37 +153,21 @@ const AppointmentBooking = ({
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-red-500 text-center">
-          <p className="text-xl font-semibold">Error loading doctors</p>
+          <p className="text-xl font-semibold">Error loading patients</p>
           <p className="text-gray-600">{error.message}</p>
         </div>
       </div>
     )
   }
 
-  const getUniqueSpecializations = () => {
-    const specializations = doctors?.map((doc) => doc.specialization) || []
-    return ['All Specializations', ...new Set(specializations)]
-  }
+  // Filter patients based on search term
+  const filteredPatients =
+    patients?.filter((patient) =>
+      patient.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    ) || []
 
-  const filteredDoctors =
-    doctors?.filter((doctor) => {
-      const specializationMatch =
-        filters.specialization === 'All Specializations' ||
-        doctor.specialization === filters.specialization
-      const availabilityMatch =
-        filters.availability === 'All Availability' ||
-        (filters.availability === 'Available' && doctor.isAvailable) ||
-        (filters.availability === 'Unavailable' && !doctor.isAvailable)
-      return specializationMatch && availabilityMatch
-    }) || []
-
-  const generateStarRating = (experience: number) => {
-    const rating = Math.min(5, Math.max(3, Math.floor(experience / 3)))
-    return rating
-  }
-
-  const handleDoctorSelect = (doctor: Doctor) => {
-    setSelectedDoctor(doctor)
+  const handlePatientSelect = (patient: Patient) => {
+    setSelectedPatient(patient)
     setCurrentStep(2)
   }
 
@@ -257,138 +215,67 @@ const AppointmentBooking = ({
     </div>
   )
 
-  const DoctorCard = ({ doctor }: { doctor: Doctor }) => {
-    const rating = generateStarRating(doctor.experience)
-    const doctorName = `${doctor.user.firstname} ${doctor.user.lastname}`
-
-    return (
-      <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-        <div className="flex items-start space-x-4">
-          <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-            {doctor.user.imagelink ? (
-              <img
-                src={doctor.user.imagelink}
-                alt={doctorName}
-                className="w-16 h-16 rounded-full object-cover"
-              />
-            ) : (
-              <User className="w-8 h-8 text-gray-400" />
-            )}
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900">{doctorName}</h3>
-              <div className="flex items-center space-x-2">
-                {doctor.isAvailable ? (
-                  <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                    Available
-                  </span>
-                ) : (
-                  <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">
-                    Busy
-                  </span>
-                )}
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 mt-1">
-              {doctor.specialization}
-            </p>
-            <p className="text-sm text-gray-500">{doctor.affiliation}</p>
-            <p className="text-sm text-gray-500 mt-1">
-              {doctor.experience} years of experience
-            </p>
-
-            <div className="flex items-center mt-2">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-4 h-4 ${
-                      i < rating
-                        ? 'text-yellow-400 fill-current'
-                        : 'text-gray-300'
-                    }`}
-                  />
-                ))}
-                <span className="ml-1 text-sm text-gray-600">({rating})</span>
-              </div>
-            </div>
-
-            <p className="text-sm text-gray-600 mt-2">{doctor.contact}</p>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          {doctor.isAvailable ? (
-            <button
-              onClick={() => handleDoctorSelect(doctor)}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Select Doctor
-            </button>
+  const PatientCard = ({ patient }: { patient: Patient }) => (
+    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+      <div className="flex items-start space-x-4">
+        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
+          {patient.user.imagelink ? (
+            <img
+              src={patient.user.imagelink}
+              alt={patient.name}
+              className="w-16 h-16 rounded-full object-cover"
+            />
           ) : (
-            <button
-              disabled
-              className="w-full bg-gray-300 text-gray-500 py-2 px-4 rounded-md cursor-not-allowed"
-            >
-              Unavailable
-            </button>
+            <User className="w-8 h-8 text-gray-400" />
           )}
         </div>
+        <div className="flex-1">
+          <h3 className="font-semibold text-gray-900">{patient.name}</h3>
+          <p className="text-sm text-gray-600 mt-1">Age: {patient.age}</p>
+          <p className="text-sm text-gray-600">Gender: {patient.gender}</p>
+        </div>
       </div>
-    )
-  }
+
+      <div className="mt-4">
+        <button
+          onClick={() => handlePatientSelect(patient)}
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+        >
+          Select Patient
+        </button>
+      </div>
+    </div>
+  )
 
   const renderStep1 = () => (
     <div className="space-y-6">
-      <div className="flex items-center space-x-4 mb-6">
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Search className="h-5 w-5 text-gray-400" />
+        </div>
         <input
           type="text"
-          placeholder="Search doctors..."
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Search patients by name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <select
-          value={filters.specialization}
-          onChange={(e) =>
-            setFilters({ ...filters, specialization: e.target.value })
-          }
-          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {getUniqueSpecializations().map((spec) => (
-            <option key={spec} value={spec}>
-              {spec}
-            </option>
-          ))}
-        </select>
-        <select
-          value={filters.experience}
-          onChange={(e) =>
-            setFilters({ ...filters, experience: e.target.value })
-          }
-          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="Any Experience">Any Experience</option>
-          <option value="0-5 years">0-5 years</option>
-          <option value="5-10 years">5-10 years</option>
-          <option value="10+ years">10+ years</option>
-        </select>
-        <select
-          value={filters.availability}
-          onChange={(e) =>
-            setFilters({ ...filters, availability: e.target.value })
-          }
-          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="All Availability">All Availability</option>
-          <option value="Available">Available</option>
-          <option value="Unavailable">Unavailable</option>
-        </select>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredDoctors.map((doctor) => (
-          <DoctorCard key={doctor.id} doctor={doctor} />
-        ))}
+        {filteredPatients.length === 0 ? (
+          <div className="col-span-2 text-center py-8">
+            <p className="text-gray-500">
+              {searchTerm
+                ? 'No patients found matching your search.'
+                : 'No patients available.'}
+            </p>
+          </div>
+        ) : (
+          filteredPatients.map((patient) => (
+            <PatientCard key={patient.id} patient={patient} />
+          ))
+        )}
       </div>
     </div>
   )
@@ -396,13 +283,13 @@ const AppointmentBooking = ({
   const renderStep2 = () => (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold mb-4">Selected Doctor</h3>
+        <h3 className="text-lg font-semibold mb-4">Selected Patient</h3>
         <div className="flex items-center space-x-4 mb-6">
           <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-            {selectedDoctor?.user.imagelink ? (
+            {selectedPatient?.user.imagelink ? (
               <img
-                src={selectedDoctor.user.imagelink}
-                alt={`${selectedDoctor.user.firstname} ${selectedDoctor.user.lastname}`}
+                src={selectedPatient.user.imagelink}
+                alt={selectedPatient.name}
                 className="w-16 h-16 rounded-full object-cover"
               />
             ) : (
@@ -410,14 +297,10 @@ const AppointmentBooking = ({
             )}
           </div>
           <div>
-            <h4 className="font-medium">
-              {selectedDoctor?.user.firstname} {selectedDoctor?.user.lastname}
-            </h4>
+            <h4 className="font-medium">{selectedPatient?.name}</h4>
+            <p className="text-sm text-gray-600">Age: {selectedPatient?.age}</p>
             <p className="text-sm text-gray-600">
-              {selectedDoctor?.specialization}
-            </p>
-            <p className="text-sm text-gray-500">
-              {selectedDoctor?.experience} years of experience
+              Gender: {selectedPatient?.gender}
             </p>
           </div>
         </div>
@@ -445,11 +328,8 @@ const AppointmentBooking = ({
                   value={field.state.value}
                   onChange={(e) => {
                     const newDate = e.target.value
-                    console.log('Date input changed to:', newDate)
                     field.handleChange(newDate)
-                    // Update our reactive state immediately
                     setSelectedDate(newDate)
-                    // Reset time when date changes
                     form.setFieldValue('time', '')
                   }}
                   onBlur={field.handleBlur}
@@ -473,10 +353,8 @@ const AppointmentBooking = ({
           <form.Field
             name="time"
             validators={{
-              onChange: ({ value }) => {
-                console.log('Time value being validated:', value)
-                return validateField(value, appointmentSchema.shape.time)
-              },
+              onChange: ({ value }) =>
+                validateField(value, appointmentSchema.shape.time),
               onBlur: ({ value }) =>
                 validateField(value, appointmentSchema.shape.time),
             }}
@@ -505,10 +383,7 @@ const AppointmentBooking = ({
                         key={slot.id}
                         type="button"
                         onClick={() => {
-                          // Ensure the time format is correct
                           const timeValue = slot.startTime
-                          console.log('Clicking time slot:', timeValue)
-                          console.log('Slot object:', slot)
                           field.handleChange(timeValue)
                         }}
                         disabled={slot.status === 'booked'}
@@ -539,12 +414,6 @@ const AppointmentBooking = ({
                 {field.state.meta.errors.length > 0 && (
                   <p className="mt-1 text-sm text-red-600">
                     {String(field.state.meta.errors[0])}
-                  </p>
-                )}
-                {/* Add debug information */}
-                {field.state.value && (
-                  <p className="mt-1 text-xs text-gray-500">
-                    Selected time: {field.state.value}
                   </p>
                 )}
               </div>
@@ -645,7 +514,7 @@ const AppointmentBooking = ({
                 disabled={!canSubmit || !isValid}
                 className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               >
-                Continue to Price & Time
+                Continue to Confirmation
               </button>
             )}
           />
@@ -665,10 +534,10 @@ const AppointmentBooking = ({
             <div className="space-y-4">
               <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
                 <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-                  {selectedDoctor?.user.imagelink ? (
+                  {selectedPatient?.user.imagelink ? (
                     <img
-                      src={selectedDoctor.user.imagelink}
-                      alt={`${selectedDoctor.user.firstname} ${selectedDoctor.user.lastname}`}
+                      src={selectedPatient.user.imagelink}
+                      alt={selectedPatient.name}
                       className="w-16 h-16 rounded-full object-cover"
                     />
                   ) : (
@@ -676,13 +545,11 @@ const AppointmentBooking = ({
                   )}
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Selected Doctor</p>
-                  <h4 className="font-medium">
-                    {selectedDoctor?.user.firstname}{' '}
-                    {selectedDoctor?.user.lastname}
-                  </h4>
+                  <p className="text-sm text-gray-600">Selected Patient</p>
+                  <h4 className="font-medium">{selectedPatient?.name}</h4>
                   <p className="text-sm text-gray-600">
-                    {selectedDoctor?.specialization}
+                    Age: {selectedPatient?.age}, Gender:{' '}
+                    {selectedPatient?.gender}
                   </p>
                 </div>
               </div>
@@ -708,20 +575,9 @@ const AppointmentBooking = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-600">Appointment Type</p>
-                  <p className="text-sm mt-1">{values.appointmentType}</p>
-                </div>
-              </div>
-
-              <div className="border-t pt-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold">Estimated Cost</span>
-                  <span className="text-2xl font-bold text-green-600">
-                    KSh 300
-                  </span>
-                </div>
+              <div>
+                <p className="text-sm text-gray-600">Appointment Type</p>
+                <p className="text-sm mt-1">{values.appointmentType}</p>
               </div>
             </div>
           )}
@@ -746,7 +602,7 @@ const AppointmentBooking = ({
                 disabled={!canSubmit}
                 className="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               >
-                {isSubmitting ? 'Booking...' : 'Confirm Appointment'}
+                {isSubmitting ? 'Scheduling...' : 'Schedule Appointment'}
               </button>
             )}
           />
@@ -756,7 +612,7 @@ const AppointmentBooking = ({
   )
 
   const steps = [
-    { number: 1, title: 'Doctor Selection' },
+    { number: 1, title: 'Patient Selection' },
     { number: 2, title: 'Date & Time' },
     { number: 3, title: 'Confirmation' },
   ]
@@ -765,7 +621,9 @@ const AppointmentBooking = ({
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Book Appointment</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Schedule Appointment
+          </h1>
           <div className="flex items-center space-x-8">
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center space-x-2">
@@ -787,51 +645,7 @@ const AppointmentBooking = ({
           </div>
         </div>
 
-        {currentStep === 1 && (
-          <div className="flex space-x-6">
-            <div className="flex-1">{renderStep1()}</div>
-            {/* <div className="w-80">
-              <div className="bg-white rounded-lg border border-gray-200 p-6 sticky top-4">
-                <h3 className="text-lg font-semibold mb-4">
-                  Appointment Summary
-                </h3>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <User className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">Selected Doctor</span>
-                  </div>
-                  <p className="text-gray-500 pl-6">
-                    {selectedDoctor
-                      ? `${selectedDoctor.user.firstname} ${selectedDoctor.user.lastname}`
-                      : 'No doctor selected'}
-                  </p>
-
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">Date & Time</span>
-                  </div>
-                  <p className="text-gray-500 pl-6">Not selected</p>
-
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">Duration</span>
-                  </div>
-                  <p className="text-gray-500 pl-6">Not selected</p>
-
-                  <div className="border-t pt-3 mt-4">
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold">Estimated Cost</span>
-                      <span className="text-xl font-bold text-green-600">
-                        KSh 300
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> */}
-          </div>
-        )}
-
+        {currentStep === 1 && renderStep1()}
         {currentStep === 2 && renderStep2()}
         {currentStep === 3 && renderStep3()}
       </div>
@@ -839,4 +653,4 @@ const AppointmentBooking = ({
   )
 }
 
-export default AppointmentBooking
+export default DoctorAppointmentForm

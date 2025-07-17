@@ -15,6 +15,7 @@
         "label": "off",
         "select-name": "off"
       }
-    ]
+    ],
+    "no-inline-styles": "off"
   }
 }

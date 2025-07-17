@@ -6,8 +6,7 @@ const DepartmentsSection = () => {
       title: 'Cardiology',
       description:
         'Expert heart care from routine check-ups to advanced cardiac treatments.',
-      bgImage:
-        'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+      bgImage: 'public/cardiology.png',
       size: 'large',
     },
     {
@@ -22,8 +21,7 @@ const DepartmentsSection = () => {
       title: 'Neurology',
       description:
         'Advanced care for brain, spine, and nervous system conditions.',
-      bgImage:
-        'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+      bgImage: '/public/neurology-image.png',
       size: 'center',
     },
     {
@@ -69,6 +67,8 @@ const DepartmentsSection = () => {
               className="absolute inset-0 bg-cover bg-center bg-no-repeat"
               style={{
                 backgroundImage: `url(${departments[0].bgImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
               }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />

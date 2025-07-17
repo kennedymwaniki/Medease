@@ -15,6 +15,7 @@ import type {
   SortingState,
 } from '@tanstack/react-table'
 import { usePatient } from '@/hooks/usePatients'
+import { useAuthStore } from '@/store/authStore'
 
 // Type definitions based on the provided data structure
 export interface Appointment {
@@ -43,7 +44,10 @@ const PatientMedicalHistoryTable: React.FC = () => {
     pageSize: 10,
   })
 
-  const patientId = 1
+  const user = useAuthStore((state) => state.user)
+
+  console.log('User from auth store:', user)
+  const patientId = Number(user?.patient?.id)
   const { data: patientData, isLoading, error } = usePatient(patientId)
 
   const columnHelper = createColumnHelper<MedicalHistory>()

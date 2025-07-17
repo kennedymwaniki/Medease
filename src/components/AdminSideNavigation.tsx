@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { Link } from '@tanstack/react-router'
 import React from 'react'
+import { LogOut } from 'lucide-react'
+import { useLogout } from '@/hooks/useAuth'
 
 export interface adminNavItemProps {
   label: string
@@ -27,15 +29,23 @@ const AdminSideNavigation = ({
     {} as Record<string, adminNavItemProps[]>,
   )
 
+  const logout = useLogout()
+  const handleLogout = () => {
+    logout()
+    window.location.href = '/login'
+  }
+
   return (
-    <div className="h-screen bg-white shadow-lg overflow-y-auto w-64">
-      <div className="p-4">
+    <div className="max-h-svh bg-white shadow-lg overflow-y-auto w-64 flex flex-col">
+      <div className="p-4 flex-1">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-            </div>
+          <div className="w-10 h-10  rounded-lg flex items-center justify-center">
+            <img
+              src="/public/Medease-logo.png"
+              alt="MedEase Logo"
+              className="w-8 h-8 rounded-full"
+            />
           </div>
           <div>
             <h1 className="text-lg font-semibold text-gray-800">MedEase</h1>
@@ -65,6 +75,9 @@ const AdminSideNavigation = ({
                     activeProps={{
                       className: 'bg-indigo-500 text-white shadow-sm',
                     }}
+                    activeOptions={{
+                      exact: item.url === '/admin/' ? true : false,
+                    }}
                     className="block rounded-lg transition-colors duration-200"
                   >
                     <div className="flex items-center gap-3 p-3 hover:bg-indigo-400 hover:text-white rounded-lg group">
@@ -81,6 +94,17 @@ const AdminSideNavigation = ({
             </div>
           ))}
         </nav>
+      </div>
+
+      {/* Logout button */}
+      <div className="p-4 border-t border-gray-200">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 p-3 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors duration-200"
+        >
+          <LogOut size={20} />
+          <span className="font-medium">Logout</span>
+        </button>
       </div>
     </div>
   )

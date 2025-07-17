@@ -11,10 +11,10 @@ export const usePatients = () => {
 }
 
 export const usePatient = (patientId: number) => {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['patient', patientId],
     queryFn: () => getPatient(patientId),
   })
 
-  return { data, isLoading, error }
+  return { data, isLoading, error, refetch }
 }

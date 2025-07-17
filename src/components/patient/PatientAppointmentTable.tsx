@@ -8,13 +8,16 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, Plus } from 'lucide-react'
 import type {
   ColumnFiltersState,
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
 import { usePatient } from '@/hooks/usePatients'
+import { useAuthStore } from '@/store/authStore'
+import Modal from '@/components/Modal'
+import AppointmentBooking from '@/components/patient/AppointmentBooking'
 
 interface PatientAppointment {
   id: number
@@ -33,9 +36,14 @@ const PatientAppointmentTable: React.FC = () => {
     pageIndex: 0,
     pageSize: 10,
   })
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const patientId = 1
-  const { data: patientData, isLoading, error } = usePatient(patientId)
+  const user = useAuthStore((state) => state.user)
+
+  console.log('User from auth store:', user)
+  const patientId = Number(user?.patient?.id)
+
+  const { data: patientData, isLoading, error, refetch } = usePatient(patientId)
   console.log('Patient Data:', patientData)
 
   const columnHelper = createColumnHelper<PatientAppointment>()
@@ -45,7 +53,7 @@ const PatientAppointmentTable: React.FC = () => {
       columnHelper.accessor('id', {
         header: 'ID',
         cell: (info) => info.getValue(),
-        size: 80,
+        size: 50,
       }),
       columnHelper.accessor('date', {
         header: 'Date',
@@ -151,6 +159,14 @@ const PatientAppointmentTable: React.FC = () => {
     onGlobalFilterChange: setSearch,
   })
 
+  const handleAppointmentSuccess = (appointmentDetails: any) => {
+    console.log('Appointment booked successfully:', appointmentDetails)
+    // Close the modal
+    setIsModalOpen(false)
+    // Refetch the patient data to update the appointments list
+    refetch()
+  }
+
   if (isLoading) {
     return (
       <div className="p-4 text-blue-600">Loading patient appointments...</div>
@@ -172,9 +188,18 @@ const PatientAppointmentTable: React.FC = () => {
   return (
     <div className="p-4">
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">
-          Patient Appointments
-        </h2>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Patient Appointments
+          </h2>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Schedule Appointment</span>
+          </button>
+        </div>
         <label
           htmlFor="search"
           className="block text-sm font-medium text-gray-700 mb-2"
@@ -313,6 +338,16 @@ const PatientAppointmentTable: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Modal for Appointment Booking */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Schedule New Appointment"
+        size="full"
+      >
+        <AppointmentBooking onAppointmentSuccess={handleAppointmentSuccess} />
+      </Modal>
     </div>
   )
 }

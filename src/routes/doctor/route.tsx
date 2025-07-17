@@ -10,6 +10,7 @@ import {
   FaUsers,
 } from 'react-icons/fa'
 import SideNavigation from '@/components/SideNavigation'
+import DoctorSideNavigation from '@/components/Doctors/DoctorSideNavigation'
 
 export const Route = createFileRoute('/doctor')({
   component: RouteComponent,
@@ -34,16 +35,16 @@ function RouteComponent() {
       url: '/doctor/prescriptions',
       icon: <FaPrescriptionBottleAlt />,
     },
-    {
-      label: 'Medical History',
-      url: '/doctor/medical-history',
-      icon: <FaFileAlt />,
-    },
-    {
-      label: 'Medications',
-      url: '/doctor/medications',
-      icon: <FaPills />,
-    },
+    // {
+    //   label: 'Medical History',
+    //   url: '/doctor/medical-history',
+    //   icon: <FaFileAlt />,
+    // },
+    // {
+    //   label: 'Medications',
+    //   url: '/doctor/medications',
+    //   icon: <FaPills />,
+    // },
     {
       label: 'Settings',
       url: '/doctor/settings',
@@ -59,7 +60,7 @@ function RouteComponent() {
 
   return (
     <div className="flex">
-      <SideNavigation navItems={navItems} />
+      <DoctorSideNavigation navItems={navItems} />
       <div className="flex-1">
         <Outlet />
       </div>

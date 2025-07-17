@@ -55,6 +55,7 @@ export interface Doctor {
   affiliation: string
   user: User
   appointments: Array<Appointment>
+  prescriptions: Array<Prescription>
 }
 
 export interface Patient {
@@ -220,6 +221,7 @@ export interface CreatePrescriptionDto {
   startDate: Date
   endDate: Date
   patientId: number
+  doctorId: number
   medicationId: number
 }
 
@@ -517,4 +519,22 @@ export interface PaymentFilters {
   patientId?: number
   dateFrom?: string
   dateTo?: string
+}
+
+// doctor available slot times
+export interface DoctorTimeSlot {
+  id: number
+  date: string // Format: YYYY-MM-DD
+  startTime: string // Format: HH:MM (24-hour format)
+  endTime: string // Format: HH:MM (24-hour format)
+  status: TimeSlotStatus
+  appointmentId?: number | null
+  doctorId: number
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export enum TimeSlotStatus {
+  AVAILABLE = 'available',
+  BOOKED = 'booked',
 }

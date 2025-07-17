@@ -33,21 +33,22 @@ function RouteComponent() {
       url: '/patient/medical-history',
       icon: <FaFileAlt />,
     },
-    {
-      label: 'Find Doctors',
-      url: '/patient/doctors',
-      icon: <FaUserMd />,
-    },
-    {
-      label: 'Payments & Billing',
-      url: '/patient/payments',
-      icon: <FaCreditCard />,
-    },
+    // {
+    //   label: 'Find Doctors',
+    //   url: '/patient/doctors',
+    //   icon: <FaUserMd />,
+    // },
+    // {
+    //   label: 'Payments & Billing',
+    //   url: '/patient/payments',
+    //   icon: <FaCreditCard />,
+    // },
     {
       label: 'Profile Settings',
       url: '/patient/profile',
       icon: <FaUser />,
     },
+
     // {
     //   label: 'Help & Support',
     //   url: '/patient/help',

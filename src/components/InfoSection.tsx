@@ -15,7 +15,7 @@ const InfoSection = () => {
       description:
         'Round-the-clock emergency care available for urgent medical situations, ensuring immediate attention when it matters most.',
       bgImage:
-        'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+        'https://images.unsplash.com/photo-1554734867-bf3c00a49371?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
       gradient: 'from-red-600/30 to-pink-600/80',
     },
     {
@@ -23,7 +23,7 @@ const InfoSection = () => {
       description:
         'Our team of certified and experienced doctors ensures the best care tailored to your needs.',
       bgImage:
-        'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+        'https://plus.unsplash.com/premium_photo-1661894592852-5cfb513eefb4?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
       gradient: 'from-blue-600/30 to-cyan-600/30',
     },
     {
@@ -31,7 +31,7 @@ const InfoSection = () => {
       description:
         'Swift and reliable ambulance services equipped with advanced life-support systems, ensuring timely.',
       bgImage:
-        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+        'https://images.unsplash.com/photo-1554734867-bf3c00a49371?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
       gradient: 'from-orange-600/20 to-yellow-600/30',
     },
   ]

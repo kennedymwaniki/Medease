@@ -1,14 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
-import DoctorStatCard from '@/components/Doctors/DoctorStatCard'
+import MedEaseAssistant from '@/components/MedEaseAssistant'
 
-export const Route = createFileRoute('/doctor/')({
+export const Route = createFileRoute('/chat')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
   return (
     <div>
-      <DoctorStatCard />
+      <MedEaseAssistant />
     </div>
   )
 }

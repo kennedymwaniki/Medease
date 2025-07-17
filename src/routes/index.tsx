@@ -5,6 +5,7 @@ import InfoSection from '@/components/InfoSection'
 import DepartmentsSection from '@/components/DepartmentSection'
 import Footer from '@/components/Footer'
 import NavBar from '@/components/NavBar'
+import HealthcareComponent from '@/components/HealthcareComponent'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -17,6 +18,7 @@ function App() {
       <HeroSection />
       <InfoSection />
       <DepartmentsSection />
+      <HealthcareComponent />
       <Footer />
     </div>
   )

@@ -1,20 +1,25 @@
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { login, registerUser } from '@/apis/authApi'
-import { authctions } from '@/store/authStore'
-// import { register } from 'node:module'
+import { useAuthStore } from '@/store/authStore'
 
 export const useLogin = () => {
   const navigate = useNavigate()
+  const setUser = useAuthStore((state) => state.setUser)
+
   const { mutate, isPending } = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      authctions.setUser(data)
-      console.log('Login successful:', data)
-      navigate({ to: '/admin' })
+      setUser(data)
+      if (data.user.role === 'admin') {
+        navigate({ to: '/admin' })
+      } else if (data.user.role === 'patient') {
+        navigate({ to: '/patient' })
+      } else if (data.user.role === 'doctor') {
+        navigate({ to: '/doctor' })
+      }
     },
     onError: (error) => {
-      // Handle login error, e.g., show an error message
       console.error('Login failed:', error)
     },
   })
@@ -27,10 +32,21 @@ export const useRegister = () => {
     onSuccess: (data) => {
       console.log('Registration successful:', data)
     },
-    onError: () => {
-      // Handle registration error, e.g., show an error message
+    onError: (error) => {
       console.error('Registration failed', error)
     },
   })
   return { mutate, isPending, error }
+}
+
+export const useLogout = () => {
+  const clearUser = useAuthStore((state) => state.clearUser)
+  const navigate = useNavigate()
+
+  const logout = () => {
+    clearUser()
+    navigate({ to: '/login' })
+  }
+
+  return logout
 }

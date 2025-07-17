@@ -70,7 +70,6 @@ const medicationSchema = z.object({
 
 type MedicationFormData = z.infer<typeof medicationSchema>
 
-// Helper function to validate with Zod
 const validateField = <T,>(value: T, schema: z.ZodType<T>) => {
   const result = schema.safeParse(value)
   if (!result.success) {
@@ -436,35 +435,6 @@ function MedicationForm() {
           />
         </div>
       </div>
-
-      {/* Debug Information */}
-      <form.Subscribe
-        selector={(state) => state.values}
-        children={(values) => (
-          <div className="mt-8 p-4 bg-gray-100 rounded-md">
-            <h3 className="text-lg font-medium mb-2">Form Data (Debug)</h3>
-            <pre className="text-xs overflow-auto max-h-40 text-gray-600">
-              {JSON.stringify(values, null, 2)}
-            </pre>
-          </div>
-        )}
-      />
-
-      {/* Form State Debug */}
-      <form.Subscribe
-        selector={(state) => [state.isValid, state.canSubmit]}
-        children={([isValid, canSubmit]) => (
-          <div className="mt-4 p-4 bg-gray-50 rounded-md">
-            <h3 className="text-sm font-medium mb-2">Form State</h3>
-            <p className="text-xs text-gray-600">
-              Valid: {isValid ? 'Yes' : 'No'}
-            </p>
-            <p className="text-xs text-gray-600">
-              Can Submit: {canSubmit ? 'Yes' : 'No'}
-            </p>
-          </div>
-        )}
-      />
     </div>
   )
 }
