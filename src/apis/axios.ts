@@ -75,7 +75,7 @@ const performTokenRefresh = async (): Promise<string | null> => {
       throw new Error('Invalid response: missing tokens')
     }
 
-    // Update the auth store with new tokens
+    // update the auth store with new tokens
     useAuthStore.setState({
       accessToken,
       refreshToken: newRefreshToken,

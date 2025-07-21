@@ -4,16 +4,16 @@ import type { UpdateUserDto } from '@/types/types'
 import { deleteUser, getUser, getUsers, updateUser } from '@/apis/usersApi'
 
 export const useUsers = () => {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['user'],
     queryFn: getUsers,
   })
 
-  return { data, isLoading, error }
+  return { data, isLoading, error, refetch }
 }
 
 export const useUser = (userId: number) => {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['user', userId],
     queryFn: () => getUser(userId),
   })

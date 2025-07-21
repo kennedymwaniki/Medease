@@ -36,10 +36,10 @@ const AdminSideNavigation = ({
   }
 
   return (
-    <div className="max-h-svh bg-white shadow-lg overflow-y-auto w-64 flex flex-col">
+    <div className="h-screen bg-white shadow-lg overflow-y-auto w-64 flex flex-col">
       <div className="p-4 flex-1">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10  rounded-lg flex items-center justify-center">
             <img
               src="/public/Medease-logo.png"
@@ -80,7 +80,7 @@ const AdminSideNavigation = ({
                     }}
                     className="block rounded-lg transition-colors duration-200"
                   >
-                    <div className="flex items-center gap-3 p-3 hover:bg-indigo-400 hover:text-white rounded-lg group">
+                    <div className="flex items-center gap-1 p-3 hover:bg-indigo-400 hover:text-white rounded-lg group">
                       <span className="text-gray-600 group-hover:text-white w-5 h-5 flex items-center justify-center">
                         {item.icon}
                       </span>

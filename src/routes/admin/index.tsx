@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import StatCard from '@/components/StatCard'
+import AdminStatCard from '@/components/admincomponents/AdminStatCard'
 // import QuickActionsComponents from '@/components/QuickActionsComponents'
 
 export const Route = createFileRoute('/admin/')({
@@ -9,8 +9,7 @@ export const Route = createFileRoute('/admin/')({
 function RouteComponent() {
   return (
     <div>
-      <StatCard />
-      {/* <QuickActionsComponents /> */}
+      <AdminStatCard />
     </div>
   )
 }

@@ -8,7 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp, Pencil, Trash } from 'lucide-react'
+import { ChevronDown, ChevronUp, Pencil, Plus, Trash } from 'lucide-react'
 import type {
   ColumnFiltersState,
   PaginationState,
@@ -16,6 +16,8 @@ import type {
 } from '@tanstack/react-table'
 import type { User } from '@/types/types'
 import { useDeleteUser, useUsers } from '@/hooks/useUser'
+import Modal from '@/components/Modal'
+import RegistrationForm from '@/components/forms/RegistrationForm'
 
 const UsersTable = () => {
   const [search, setSearch] = useState('')
@@ -25,11 +27,18 @@ const UsersTable = () => {
     pageIndex: 0,
     pageSize: 10,
   })
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const { data: users, error } = useUsers()
+  const { data: users, error, refetch } = useUsers()
   const { isPending, removeUser } = useDeleteUser()
   console.log('Users data:', users)
   const columnHelper = createColumnHelper<User>()
+
+  const handleRegistrationSuccess = () => {
+    setIsModalOpen(false)
+
+    refetch()
+  }
 
   const columns = useMemo(
     () => [
@@ -157,21 +166,34 @@ const UsersTable = () => {
 
   return (
     <div className="p-4">
-      <div className="mb-4">
-        <label
-          htmlFor="search"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Search Users:
-        </label>
-        <input
-          id="search"
-          type="text"
-          value={search}
-          onChange={handleSearch}
-          placeholder="Search by name, email, role, or ID..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
+      {/* Header with search and add user button */}
+      <div className="mb-4 flex justify-between items-center gap-4">
+        <div className="flex-1">
+          <label
+            htmlFor="search"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Search Users:
+          </label>
+          <input
+            id="search"
+            type="text"
+            value={search}
+            onChange={handleSearch}
+            placeholder="Search by name, email, role, or ID..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <div className="flex-shrink-0">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Add New User</span>
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
@@ -295,6 +317,16 @@ const UsersTable = () => {
           </button>
         </div>
       </div>
+
+      {/* Modal for Registration Form */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Add New User"
+        size="lg"
+      >
+        <RegistrationForm onSuccess={handleRegistrationSuccess} />
+      </Modal>
     </div>
   )
 }

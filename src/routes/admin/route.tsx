@@ -82,25 +82,10 @@ function RouteComponent() {
       icon: <FaChartBar />,
       category: 'Operations',
     },
-
-    // System
-    {
-      label: 'Notifications',
-      url: '/admin/notifications',
-      icon: <FaBell />,
-      category: 'System',
-    },
     {
       label: 'Settings',
       url: '/admin/settings',
       icon: <FaCog />,
-      category: 'System',
-    },
-    // logout
-    {
-      label: 'Logout',
-      url: '/admin/logout',
-      icon: <FaSignOutAlt />,
       category: 'System',
     },
   ]
@@ -110,7 +95,7 @@ function RouteComponent() {
       <div>
         <AdminSideNavigation navItems={navItems} />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 bg-slate-100">
         <Outlet />
       </div>
       {/* <App /> */}

@@ -62,7 +62,11 @@ const validateField = <T,>(value: T, schema: z.ZodType<T>) => {
   return undefined
 }
 
-function RegistrationForm() {
+interface RegistrationFormProps {
+  onSuccess?: () => void
+}
+
+function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const { mutate: registerUser, error } = useRegister()
   const form = useForm({
     defaultValues: {
@@ -85,13 +89,15 @@ function RegistrationForm() {
 
       // Remove confirmPassword from the data sent to the server
       const { confirmPassword, ...userData } = value
-      await registerUser(userData)
-      if (error) {
-        console.error('Error creating user:', error)
-      } else {
+      try {
+        await registerUser(userData)
         console.log('User registered successfully:', userData)
+        form.reset()
+        // Call onSuccess callback if provided
+        onSuccess?.()
+      } catch (error) {
+        console.error('Error creating user:', error)
       }
-      form.reset()
     },
   })
 
@@ -391,39 +397,6 @@ function RegistrationForm() {
           />
         </div>
       </div>
-
-      {/* Debug Information */}
-      <form.Subscribe
-        selector={(state) => state.values}
-        children={(values) => (
-          <div className="mt-8 p-4 bg-gray-100 rounded-md">
-            <h3 className="text-lg font-medium mb-2">Form Data (Debug)</h3>
-            <pre className="text-xs overflow-auto max-h-40 text-gray-600">
-              {JSON.stringify(
-                { ...values, password: '***', confirmPassword: '***' },
-                null,
-                2,
-              )}
-            </pre>
-          </div>
-        )}
-      />
-
-      {/* Form State Debug */}
-      <form.Subscribe
-        selector={(state) => [state.isValid, state.canSubmit]}
-        children={([isValid, canSubmit]) => (
-          <div className="mt-4 p-4 bg-gray-50 rounded-md">
-            <h3 className="text-sm font-medium mb-2">Form State</h3>
-            <p className="text-xs text-gray-600">
-              Valid: {isValid ? 'Yes' : 'No'}
-            </p>
-            <p className="text-xs text-gray-600">
-              Can Submit: {canSubmit ? 'Yes' : 'No'}
-            </p>
-          </div>
-        )}
-      />
     </div>
   )
 }
