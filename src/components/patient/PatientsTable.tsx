@@ -39,7 +39,7 @@ const PatientsTable: React.FC = () => {
 
   const handleAssignPrescription = (patient: Patient) => {
     setSelectedPatientId(patient.id)
-    setSelectedPatientName(patient.name)
+    setSelectedPatientName(patient.name ?? '')
     setIsModalOpen(true)
   }
 
@@ -66,7 +66,7 @@ const PatientsTable: React.FC = () => {
         cell: (info) => (
           <div className="flex justify-center">
             <img
-              src={info.getValue() || '/api/placeholder/40/40'}
+              src={info.getValue() || ''}
               alt="Patient"
               className="w-10 h-10 rounded-full object-cover"
               onError={(e) => {
@@ -83,7 +83,7 @@ const PatientsTable: React.FC = () => {
         cell: (info) => (
           <div
             className="max-w-xs truncate font-medium"
-            title={info.getValue()}
+            title={info.getValue() || undefined}
           >
             {info.getValue()}
           </div>
@@ -102,17 +102,20 @@ const PatientsTable: React.FC = () => {
       columnHelper.accessor('gender', {
         header: 'Gender',
         cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
+          <div
+            className="max-w-xs truncate"
+            title={info.getValue() || 'unknown'}
+          >
             <span
               className={`px-2 py-1 rounded-full text-xs font-medium ${
-                info.getValue().toLowerCase() === 'male'
+                info.getValue()?.toLowerCase() === 'male'
                   ? 'bg-blue-100 text-blue-800'
-                  : info.getValue().toLowerCase() === 'female'
+                  : info.getValue()?.toLowerCase() === 'female'
                     ? 'bg-pink-100 text-pink-800'
                     : 'bg-gray-100 text-gray-800'
               }`}
             >
-              {info.getValue()}
+              {info.getValue() ?? 'To be specified'}
             </span>
           </div>
         ),
@@ -120,9 +123,12 @@ const PatientsTable: React.FC = () => {
       columnHelper.accessor('contact', {
         header: 'Contact',
         cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
+          <div
+            className="max-w-xs truncate"
+            title={info.getValue() || undefined}
+          >
             <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-              {info.getValue()}
+              {info.getValue() ?? '.......'}
             </span>
           </div>
         ),
@@ -130,7 +136,10 @@ const PatientsTable: React.FC = () => {
       columnHelper.accessor('address', {
         header: 'Address',
         cell: (info) => (
-          <div className="max-w-md truncate" title={info.getValue()}>
+          <div
+            className="max-w-md truncate"
+            title={info.getValue() || undefined}
+          >
             <span className="text-gray-700">{info.getValue()}</span>
           </div>
         ),
@@ -150,7 +159,7 @@ const PatientsTable: React.FC = () => {
             </button>
           </div>
         ),
-        size: 150,
+        size: 10,
         enableSorting: false,
       }),
     ],
@@ -359,10 +368,12 @@ const PatientsTable: React.FC = () => {
         title={`Assign Prescription - ${selectedPatientName}`}
         size="lg"
       >
-        <DoctorPrescriptionForm
-          patientId={selectedPatientId || undefined}
-          onSuccess={handlePrescriptionSuccess}
-        />
+        {selectedPatientId && (
+          <DoctorPrescriptionForm
+            patientId={selectedPatientId}
+            onSuccess={handlePrescriptionSuccess}
+          />
+        )}
       </Modal>
     </div>
   )

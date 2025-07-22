@@ -60,11 +60,11 @@ export interface Doctor {
 
 export interface Patient {
   id: number
-  name: string
-  age: number
-  gender: string
-  contact: string
-  address: string
+  name: string | null
+  age: number | null
+  gender: string | null
+  contact: string | null
+  address: string | null
   user: User
   appointments: Array<Appointment>
   prescriptions: Array<Prescription>
@@ -81,6 +81,8 @@ export interface Appointment {
   title: string
   patient: Patient
   doctor: Doctor
+  user_url: string
+  admin_url: string
 }
 
 export interface Medication {

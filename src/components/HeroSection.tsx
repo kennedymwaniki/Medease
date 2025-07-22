@@ -1,10 +1,10 @@
 const HeroSection = () => {
   return (
-    <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-24">
+      <div className="max-w-8xl mx-auto px-8 sm:px-6 lg:px-60">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div className="space-y-8 order-2 lg:order-1 bg-white rounded-3xl p-8 shadow-xl">
-            <div className="space-y-6">
+          <div className="space-y-6 order-2 lg:order-1 bg-white/10 rounded-3xl p-8 shadow-xl">
+            <div className="space-y-6 h-96">
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
                 Empowering
                 <br />
@@ -62,45 +62,15 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* Right Content - Image with Floating Elements */}
-          <div className="relative order-1 lg:order-2 bg-white rounded-3xl p-8 shadow-xl">
+          <div className="relative order-1 lg:order-2 bg-white rounded-3xl  shadow-xl">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl">
               <img
-                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                src="public/HeroImage.png"
                 alt="Doctor with family"
-                className="w-full h-96 lg:h-[500px] object-cover"
+                className="w-full h-96 lg:h-[600px] object-cover"
               />
             </div>
 
-            {/* Floating Elements */}
-            <div className="absolute -top-4 -left-4 bg-white rounded-2xl p-4 shadow-xl border">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm font-medium text-gray-700">
-                  Better Health
-                </span>
-              </div>
-            </div>
-
-            <div className="absolute top-1/2 -right-4 bg-white rounded-2xl p-4 shadow-xl border">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span className="text-sm font-medium text-gray-700">
-                  Better Care
-                </span>
-              </div>
-            </div>
-
-            <div className="absolute -bottom-4 right-8 bg-white rounded-2xl p-4 shadow-xl border">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                <span className="text-sm font-medium text-gray-700">
-                  Your Health, Our Priority
-                </span>
-              </div>
-            </div>
-
-            {/* Decorative Elements */}
             <div className="absolute -z-10 top-1/4 -left-8 w-32 h-32 bg-gradient-to-br from-purple-200 to-purple-300 rounded-full opacity-60"></div>
             <div className="absolute -z-10 bottom-1/4 -right-8 w-24 h-24 bg-gradient-to-br from-blue-200 to-blue-300 rounded-full opacity-60"></div>
           </div>

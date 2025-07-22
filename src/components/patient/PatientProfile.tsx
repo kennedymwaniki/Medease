@@ -2,10 +2,11 @@ import { useState } from 'react'
 import {
   Calendar,
   Camera,
+  Edit,
   MapPin,
   Upload,
   User,
-  UserCircle,
+  UserCircle, // Add this import
 } from 'lucide-react'
 import { usePatient } from '@/hooks/usePatients'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,24 +16,33 @@ import { Badge } from '@/components/ui/badge'
 import uploadFile from '@/lib/uploads'
 import { useUpdateUser } from '@/hooks/useUser'
 import { useAuthStore } from '@/store/authStore'
+// Add these imports
+import Modal from '@/components/Modal'
+import PatientProfileForm from '@/components/patient/PatientProfileForm'
 
 function PatientProfile() {
-  // Using Zustand store
-  // const { user } = useAuthStore((state) => ({
-  //   user: state.user,
-  // }))
   const user = useAuthStore((state) => state.user)
-
-  console.log('User from auth store:', user)
-
   const patientId = user?.patient?.id
 
-  const { data: patientData, isLoading, error } = usePatient(patientId!)
+  const {
+    data: patientData,
+    isLoading,
+    error,
+    refetch,
+  } = usePatient(patientId!) // Add refetch
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
+  // Add this state for the modal
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const { updateUserProfile, isPending } = useUpdateUser()
+
+  // Add this handler for the edit success
+  const handleEditSuccess = () => {
+    setIsEditModalOpen(false)
+    refetch() // Refetch data after successful update
+  }
 
   console.log('Ths is the patientData', patientData)
 
@@ -149,10 +159,11 @@ function PatientProfile() {
   }
 
   return (
-    <div className=" mx-auto px-4 py-2 max-w-7xl">
-      <div className="space-y-6 grid grid-cols-2 gap-8">
-        <div>
-          <div className="text-center mb-8">
+    <div className="mx-auto px-4 py-2 max-w-7xl">
+      <div className="space-y-6">
+        {/* Add this header section with the edit button */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-center flex-1">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Patient Profile
             </h1>
@@ -160,261 +171,290 @@ function PatientProfile() {
               Manage your personal information and profile picture
             </p>
           </div>
+          <Button
+            onClick={() => setIsEditModalOpen(true)}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+          >
+            <Edit className="h-4 w-4" />
+            Edit Profile
+          </Button>
+        </div>
 
+        {/* Change this from space-y-6 grid grid-cols-2 gap-8 to just grid grid-cols-2 gap-8 */}
+        <div className="grid grid-cols-2 gap-8">
+          <div>
+            {/* Remove the duplicate header that was inside the first div */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Camera className="h-5 w-5" />
+                  Profile Picture
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <div className="mb-6">
+                  <Avatar className="h-32 w-32 mx-auto mb-4">
+                    <AvatarImage
+                      src={patientData.user.imagelink || undefined}
+                      alt={patientData.name || 'Patient'}
+                    />
+                    <AvatarFallback className="text-2xl">
+                      {patientData.user.imagelink ? (
+                        <UserCircle className="h-16 w-16" />
+                      ) : (
+                        getInitials(patientData.name || 'Unknown User')
+                      )}
+                    </AvatarFallback>
+                  </Avatar>
+                  {!patientData.user.imagelink && (
+                    <p className="text-sm text-gray-500">
+                      No profile picture uploaded
+                    </p>
+                  )}
+                </div>
+
+                {/* Image Upload Form */}
+                <div className="space-y-4">
+                  <div className="flex flex-col items-center gap-4">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="hidden"
+                      id="image-upload"
+                    />
+                    <label
+                      htmlFor="image-upload"
+                      className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <Upload className="h-4 w-4" />
+                      Choose Image
+                    </label>
+                  </div>
+
+                  {/* Preview Section */}
+                  {previewUrl && (
+                    <div className="space-y-4">
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                        <img
+                          src={previewUrl}
+                          alt="Preview"
+                          className="h-32 w-32 object-cover rounded-full mx-auto"
+                        />
+                        <p className="text-sm text-gray-600 mt-2">Preview</p>
+                      </div>
+                      <div className="flex gap-2 justify-center">
+                        <Button
+                          onClick={handleImageUpload}
+                          disabled={isUploading}
+                          className="flex items-center gap-2"
+                        >
+                          {isUploading ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              Uploading...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="h-4 w-4" />
+                              Upload Image
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={clearSelection}
+                          disabled={isUploading}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Personal Information */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Camera className="h-5 w-5" />
-                Profile Picture
+                <User className="h-5 w-5" />
+                Personal Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-center">
-              <div className="mb-6">
-                <Avatar className="h-32 w-32 mx-auto mb-4">
-                  <AvatarImage
-                    src={patientData.user.imagelink || undefined}
-                    alt={patientData.name}
-                  />
-                  <AvatarFallback className="text-2xl">
-                    {patientData.user.imagelink ? (
-                      <UserCircle className="h-16 w-16" />
-                    ) : (
-                      getInitials(patientData.name)
-                    )}
-                  </AvatarFallback>
-                </Avatar>
-                {!patientData.user.imagelink && (
-                  <p className="text-sm text-gray-500">
-                    No profile picture uploaded
-                  </p>
-                )}
-              </div>
-
-              {/* Image Upload Form */}
-              <div className="space-y-4">
-                <div className="flex flex-col items-center gap-4">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                    className="hidden"
-                    id="image-upload"
-                  />
-                  <label
-                    htmlFor="image-upload"
-                    className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    <Upload className="h-4 w-4" />
-                    Choose Image
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Name */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Full Name
                   </label>
-                </div>
-
-                {/* Preview Section */}
-                {previewUrl && (
-                  <div className="space-y-4">
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                      <img
-                        src={previewUrl}
-                        alt="Preview"
-                        className="h-32 w-32 object-cover rounded-full mx-auto"
-                      />
-                      <p className="text-sm text-gray-600 mt-2">Preview</p>
-                    </div>
-                    <div className="flex gap-2 justify-center">
-                      <Button
-                        onClick={handleImageUpload}
-                        disabled={isUploading}
-                        className="flex items-center gap-2"
-                      >
-                        {isUploading ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                            Uploading...
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="h-4 w-4" />
-                            Upload Image
-                          </>
-                        )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={clearSelection}
-                        disabled={isUploading}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <User className="h-4 w-4 text-gray-500" />
+                    <span className="text-gray-900 font-medium">
+                      {patientData.name}
+                    </span>
                   </div>
-                )}
+                </div>
+
+                {/* Age */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Age
+                  </label>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <Calendar className="h-4 w-4 text-gray-500" />
+                    <span className="text-gray-900">
+                      {patientData.age} years old
+                    </span>
+                  </div>
+                </div>
+
+                {/* Gender */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Gender
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      className={getGenderColor(
+                        patientData.gender || 'unknown',
+                      )}
+                    >
+                      {patientData.gender || 'Not specified'}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Contact */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Contact
+                  </label>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <User className="h-4 w-4 text-gray-500" />
+                    <span className="text-gray-900">{patientData.contact}</span>
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Address
+                  </label>
+                  <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+                    <MapPin className="h-4 w-4 text-gray-500 mt-0.5" />
+                    <span className="text-gray-900">{patientData.address}</span>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Personal Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Personal Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Name */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Full Name
-                </label>
-                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-900 font-medium">
-                    {patientData.name}
-                  </span>
-                </div>
-              </div>
-
-              {/* Age */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Age</label>
-                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                  <Calendar className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-900">
-                    {patientData.age} years old
-                  </span>
-                </div>
-              </div>
-
-              {/* Gender */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Gender
-                </label>
-                <div className="flex items-center gap-2">
-                  <Badge className={getGenderColor(patientData.gender)}>
-                    {patientData.gender}
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Contact */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Contact
-                </label>
-                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-900">{patientData.contact}</span>
-                </div>
-              </div>
-
-              {/* Address */}
-              <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Address
-                </label>
-                <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
-                  <MapPin className="h-4 w-4 text-gray-500 mt-0.5" />
-                  <span className="text-gray-900">{patientData.address}</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Account Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UserCircle className="h-5 w-5" />
-              Account Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Email */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Email
-                </label>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <span className="text-gray-900">
-                    {patientData.user.email}
-                  </span>
-                </div>
-              </div>
-
-              {/* First Name */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  First Name
-                </label>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <span className="text-gray-900">
-                    {patientData.user.firstname}
-                  </span>
-                </div>
-              </div>
-
-              {/* Last Name */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Last Name
-                </label>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <span className="text-gray-900">
-                    {patientData.user.lastname}
-                  </span>
-                </div>
-              </div>
-
-              {/* Role */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Role
-                </label>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="capitalize">
-                    {patientData.user.role}
-                  </Badge>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Stats */}
-        <div className="grid md:grid-cols-3 gap-2">
+          {/* Account Information */}
           <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-2xl font-bold text-blue-600">
-                {patientData.appointments.length}
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UserCircle className="h-5 w-5" />
+                Account Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Email */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-900">
+                      {patientData.user.email}
+                    </span>
+                  </div>
+                </div>
+
+                {/* First Name */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    First Name
+                  </label>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-900">
+                      {patientData.user.firstname}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Last Name */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Last Name
+                  </label>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-900">
+                      {patientData.user.lastname}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Role */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Role
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="capitalize">
+                      {patientData.user.role}
+                    </Badge>
+                  </div>
+                </div>
               </div>
-              <p className="text-sm text-gray-600">Total Appointments</p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-2xl font-bold text-green-600">
-                {patientData.prescriptions.length}
-              </div>
-              <p className="text-sm text-gray-600">Active Prescriptions</p>
-            </CardContent>
-          </Card>
+          {/* Quick Stats */}
+          <div className="grid md:grid-cols-3 gap-2">
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="text-2xl font-bold text-blue-600">
+                  {patientData.appointments.length}
+                </div>
+                <p className="text-sm text-gray-600">Total Appointments</p>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-2xl font-bold text-purple-600">
-                {patientData.medicalHistories.length}
-              </div>
-              <p className="text-sm text-gray-600">Medical Records</p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="text-2xl font-bold text-green-600">
+                  {patientData.prescriptions.length}
+                </div>
+                <p className="text-sm text-gray-600">Active Prescriptions</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="text-2xl font-bold text-purple-600">
+                  {patientData.medicalHistories.length}
+                </div>
+                <p className="text-sm text-gray-600">Medical Records</p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
+
+      {/* Add this modal at the end, before the closing div */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Edit Patient Profile"
+        size="lg"
+      >
+        <PatientProfileForm onSuccess={handleEditSuccess} />
+      </Modal>
     </div>
   )
 }

@@ -8,7 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp, Plus } from 'lucide-react'
+import { ChevronDown, ChevronUp, Plus, Video } from 'lucide-react'
 import type {
   ColumnFiltersState,
   PaginationState,
@@ -26,6 +26,7 @@ interface DoctorAppointment {
   status: string
   duration: number
   title: string
+  admin_url?: string | null
 }
 
 const DoctorAppointmentsTable: React.FC = () => {
@@ -47,6 +48,10 @@ const DoctorAppointmentsTable: React.FC = () => {
   console.log('Doctor Data with appointments:', doctorData)
 
   const columnHelper = createColumnHelper<DoctorAppointment>()
+
+  const handleZoomClick = (adminUrl: string) => {
+    window.open(adminUrl, '_blank')
+  }
 
   const columns = useMemo(
     () => [
@@ -118,6 +123,28 @@ const DoctorAppointmentsTable: React.FC = () => {
             <span className="font-medium">{info.getValue()}</span>
           </div>
         ),
+      }),
+      columnHelper.accessor('admin_url', {
+        header: 'Zoom Meeting',
+        cell: (info) => {
+          const adminUrl = info.getValue()
+          return (
+            <div className="flex items-center justify-center">
+              {adminUrl ? (
+                <button
+                  onClick={() => handleZoomClick(adminUrl)}
+                  className="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                  title="Join Zoom Meeting"
+                >
+                  <Video className="w-4 h-4" />
+                </button>
+              ) : (
+                <span className="text-gray-400 text-xs">No meeting link</span>
+              )}
+            </div>
+          )
+        },
+        size: 120,
       }),
     ],
     [columnHelper],
