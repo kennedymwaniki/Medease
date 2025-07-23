@@ -8,14 +8,17 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, CreditCard } from 'lucide-react'
+import { toast } from 'sonner'
 import type {
   ColumnFiltersState,
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
+import type { PaystackPushResponse } from '@/types/types'
 import { usePatient } from '@/hooks/usePatients'
 import { useAuthStore } from '@/store/authStore'
+import { usePaymentsPaystack } from '@/hooks/usePayments'
 
 interface PatientPrescription {
   id: number
@@ -25,15 +28,24 @@ interface PatientPrescription {
   status: string
   startDate: Date
   endDate: Date
+  isPaid: boolean
 }
 
 const PatientPrescriptionTable: React.FC = () => {
   const user = useAuthStore((state) => state.user)
+  const userEmail = user?.email || ''
 
-  console.log('User from auth store:', user)
+  const { payStackPaymentAsync, isPending, paymentError } =
+    usePaymentsPaystack()
+
+  // console.log('User from auth store:', user)
   const patientId = Number(user?.patient?.id)
-  const { data: patientData, isLoading, error } = usePatient(patientId)
-  console.log('Patient Data for prescriptions:', patientData)
+  const {
+    data: patientData,
+    isLoading,
+    error: patienterror,
+  } = usePatient(patientId)
+  // console.log('Patient Data for prescriptions:', patientData)
 
   const [search, setSearch] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
@@ -44,6 +56,34 @@ const PatientPrescriptionTable: React.FC = () => {
   })
 
   const columnHelper = createColumnHelper<PatientPrescription>()
+
+  const handlePayment = async (
+    prescriptionId: number,
+    medicationName: string,
+  ) => {
+    const amount = 1000 // Example amount, replace with actual logic to get amount
+    console.log('Payment initialized')
+
+    try {
+      toast.success(`Payment initialized for ${medicationName}`, {
+        description: `Processing payment for prescription ID: ${prescriptionId}`,
+      })
+
+      const result = await payStackPaymentAsync({
+        email: userEmail,
+        amount,
+      })
+      console.log('Payment result from paystack:', result.data)
+
+      if (result.data.data.authorization_url) {
+        window.location.href = result.data.data.authorization_url
+      }
+      toast.success('Payment successful! Redirecting to payment page...')
+    } catch (error) {
+      console.error('Payment failed:', error)
+      toast.error('Payment failed. Please try again.')
+    }
+  }
 
   const columns = useMemo(
     () => [
@@ -102,6 +142,22 @@ const PatientPrescriptionTable: React.FC = () => {
           </div>
         ),
       }),
+      columnHelper.accessor('isPaid', {
+        header: 'Payment Status',
+        cell: (info) => (
+          <div className="max-w-xs truncate">
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                info.getValue()
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800'
+              }`}
+            >
+              {info.getValue() ? 'Paid' : 'Unpaid'}
+            </span>
+          </div>
+        ),
+      }),
       columnHelper.accessor('startDate', {
         header: 'Start Date',
         cell: (info) => {
@@ -124,8 +180,44 @@ const PatientPrescriptionTable: React.FC = () => {
           )
         },
       }),
+      columnHelper.display({
+        id: 'actions',
+        header: 'Actions',
+        cell: (info) => {
+          const isPaid = info.row.original.isPaid
+          const isDisabled = isPaid || isPending
+
+          return (
+            <div className="flex justify-center">
+              <button
+                disabled={isDisabled}
+                onClick={() =>
+                  !isPaid &&
+                  handlePayment(
+                    info.row.original.id,
+                    info.row.original.medicationName,
+                  )
+                }
+                className={`flex items-center gap-1 px-3 py-1 text-white text-xs font-medium rounded transition-colors focus:outline-none focus:ring-2 ${
+                  isPaid
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : isDisabled
+                      ? 'bg-green-400 cursor-not-allowed'
+                      : 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
+                }`}
+                title={isPaid ? 'Already Paid' : 'Pay for Prescription'}
+              >
+                <CreditCard className="w-3 h-3" />
+                {isPaid ? 'Paid' : isPending ? 'Paying.....' : 'Pay Now'}
+              </button>
+            </div>
+          )
+        },
+        size: 100,
+        enableSorting: false,
+      }),
     ],
-    [columnHelper],
+    [columnHelper, isPending],
   )
 
   // Global filter function
@@ -175,12 +267,20 @@ const PatientPrescriptionTable: React.FC = () => {
     )
   }
 
-  if (error) {
+  if (patienterror) {
     return (
       <div className="p-4 text-red-600">
-        Error fetching patient prescriptions: {error.message}
+        Error fetching patient prescriptions: {patienterror.message}
       </div>
     )
+  }
+
+  if (paymentError) {
+    return <p>An Error Ocurred</p>
+  }
+
+  if (isPending) {
+    return <p>Loading......</p>
   }
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,7 +288,7 @@ const PatientPrescriptionTable: React.FC = () => {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-1">
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-gray-900 mb-2">
           Patient Prescriptions
@@ -260,13 +360,13 @@ const PatientPrescriptionTable: React.FC = () => {
               </tr>
             ))}
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white">
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="hover:bg-gray-50">
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
-                    className="border border-gray-300 px-4 py-3 text-sm text-gray-900"
+                    className="border border-gray-300 px-6 py-0.5 text-sm text-gray-900"
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>

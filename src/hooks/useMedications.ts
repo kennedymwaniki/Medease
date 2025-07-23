@@ -13,6 +13,7 @@ export const useMedications = () => {
     data: medications,
     isLoading,
     isError,
+    refetch,
     error,
   } = useQuery({
     queryKey: ['medications'],
@@ -22,6 +23,7 @@ export const useMedications = () => {
   return {
     medications,
     isLoading,
+    refetch,
     isError,
     error,
   }

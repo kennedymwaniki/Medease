@@ -8,7 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp, Pencil, Trash } from 'lucide-react'
+import { ChevronDown, ChevronUp, Pencil, Plus, Trash } from 'lucide-react'
 import type {
   ColumnFiltersState,
   PaginationState,
@@ -16,6 +16,8 @@ import type {
 } from '@tanstack/react-table'
 import type { Medication } from '@/types/types'
 import { useDeleteMedication, useMedications } from '@/hooks/useMedications'
+import Modal from '@/components/Modal'
+import MedicationForm from '@/components/forms/DoctorMedicationForm'
 
 const MedicationsTable = () => {
   const [search, setSearch] = useState('')
@@ -25,8 +27,9 @@ const MedicationsTable = () => {
     pageIndex: 0,
     pageSize: 10,
   })
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const { medications, isLoading, isError, error } = useMedications()
+  const { medications, isLoading, isError, error, refetch } = useMedications()
   const { isPending, removeMedication } = useDeleteMedication()
   console.log('Medications data:', medications)
   const columnHelper = createColumnHelper<Medication>()
@@ -211,9 +214,29 @@ const MedicationsTable = () => {
     setSearch(event.target.value)
   }
 
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+  }
+
+  const handleMedicationSuccess = () => {
+    handleModalClose()
+    refetch() // Refresh the medications list
+  }
+
   return (
     <div className="p-4">
       <div className="mb-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">Medications</h2>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Medication</span>
+          </button>
+        </div>
+
         <label
           htmlFor="search"
           className="block text-sm font-medium text-gray-700 mb-2"
@@ -351,6 +374,16 @@ const MedicationsTable = () => {
           </button>
         </div>
       </div>
+
+      {/* Modal for Medication Form */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        title="Add New Medication"
+        size="lg"
+      >
+        <MedicationForm onSuccess={handleMedicationSuccess} />
+      </Modal>
     </div>
   )
 }

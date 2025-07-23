@@ -104,9 +104,9 @@ export const getValidToken = async (): Promise<string | null> => {
   try {
     const decoded = jwtDecode<JWTPayload>(accessToken)
     const currentTime = Math.floor(Date.now() / 1000)
-    const bufferTime = 30
+    // const bufferTime = 30
 
-    if (decoded.exp <= currentTime + bufferTime) {
+    if (decoded.exp <= currentTime) {
       console.log('Token expired or expiring soon, refreshing...')
       accessToken = await getNewAccessToken()
       console.log('This is the new access token:', accessToken)

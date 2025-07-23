@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import React from 'react'
 import { Activity, Bell, Calendar, Pill } from 'lucide-react'
 import { usePatient } from '@/hooks/usePatients'
@@ -27,7 +28,7 @@ const PatientStatCard: React.FC = () => {
     {
       icon: <Calendar size={24} />,
       title: 'Next Appointment',
-      number: patientData?.appointments.length.toString() || '0',
+      number: patientData?.appointments?.length.toString() ?? '0',
       subtitle: 'Dr. Smith - Cardiology',
       bgColor: 'bg-blue-50',
       iconColor: 'text-blue-600',
@@ -35,7 +36,18 @@ const PatientStatCard: React.FC = () => {
     {
       icon: <Pill size={24} />,
       title: 'Active Prescriptions',
-      number: patientData?.prescriptions.length.toString() || '0',
+      number: patientData?.prescriptions.length.toString() ?? '0',
+      subtitle: 'All up to date',
+      bgColor: 'bg-green-50',
+      iconColor: 'text-green-600',
+    },
+    {
+      icon: <Pill size={24} />,
+      title: 'Active Prescriptions',
+      number:
+        patientData?.prescriptions
+          ?.filter((p) => p.status === 'active')
+          ?.length?.toString() ?? '0',
       subtitle: 'All up to date',
       bgColor: 'bg-green-50',
       iconColor: 'text-green-600',

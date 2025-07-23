@@ -25,3 +25,16 @@ export const deletePatient = async (patientId: number) => {
   const response = await api.delete(`/patients/${patientId}`)
   return response.data
 }
+
+export const updatePatient = async (
+  patientId: number,
+  data: Partial<Patient>,
+): Promise<Patient> => {
+  const response = await api.patch(`/patients/${patientId}`, data)
+  if (response.status !== 200) {
+    console.error('Failed to update patient data:', response)
+    throw new Error('Failed to update patient data')
+  }
+  console.log('Updated patient data:', response.data)
+  return response.data
+}

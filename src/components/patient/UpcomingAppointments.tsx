@@ -1,6 +1,7 @@
 import React from 'react'
 import { Calendar, Eye, Stethoscope, UserCheck } from 'lucide-react'
 import { usePatient } from '@/hooks/usePatients'
+import { useAuthStore } from '@/store/authStore'
 
 interface AppointmentIconProps {
   title: string
@@ -51,7 +52,10 @@ const AppointmentIcon: React.FC<AppointmentIconProps> = ({ title }) => {
 }
 
 const UpcomingAppointments: React.FC = () => {
-  const patientId = 1
+  const user = useAuthStore((state) => state.user)
+
+  console.log('User from auth store:', user)
+  const patientId = Number(user?.patient?.id)
   const { data: patientData, isLoading, error } = usePatient(patientId)
 
   if (isLoading) {

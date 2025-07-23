@@ -79,7 +79,7 @@ const validateField = <T,>(value: T, schema: z.ZodType<T>) => {
   return undefined
 }
 
-function MedicationForm() {
+function DoctorMedicationForm() {
   const { addMedication, error } = useCreateMedication()
   const form = useForm({
     defaultValues: {
@@ -469,4 +469,4 @@ function MedicationForm() {
   )
 }
 
-export default MedicationForm
+export default DoctorMedicationForm

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
-import { usePatient } from '@/hooks/usePatients'
+import { usePatient, useUpdatePatientProfile } from '@/hooks/usePatients'
 import { useUpdateUser } from '@/hooks/useUser'
 import { useAuthStore } from '@/store/authStore'
 
@@ -54,8 +54,12 @@ const PatientProfileForm: React.FC<PatientProfileFormProps> = ({
   onSuccess,
 }) => {
   const user = useAuthStore((state) => state.user)
-  const userId = Number(user?.id)
-  const { updateUserProfile, error, isPending } = useUpdateUser()
+  const patientId = Number(user?.patient?.id)
+  const {
+    mutate: updatePatientProfile,
+    error,
+    isPending,
+  } = useUpdatePatientProfile()
 
   const form = useForm({
     defaultValues: {
@@ -73,9 +77,9 @@ const PatientProfileForm: React.FC<PatientProfileFormProps> = ({
       }
 
       const profileData = {
-        userId,
+        patientId,
         data: {
-          firstname: result.data.name,
+          name: result.data.name,
           age: result.data.age,
           gender: result.data.gender,
           contact: result.data.contact,
@@ -84,7 +88,7 @@ const PatientProfileForm: React.FC<PatientProfileFormProps> = ({
       }
 
       console.log('Patient profile data:', profileData)
-      updateUserProfile(profileData)
+      updatePatientProfile(profileData)
 
       form.reset()
       onSuccess?.()

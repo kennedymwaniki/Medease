@@ -23,7 +23,7 @@ const validateField = <T,>(value: T, schema: z.ZodType<T>) => {
 
 function OtpVerificationForm2() {
   const [email] = useState('k****@gmail.com')
-  const [timer, setTimer] = useState(225) // 3:45 in seconds
+  const [timer, setTimer] = useState(240) // 4:00 in seconds
   const [canResend, setCanResend] = useState(false)
 
   useEffect(() => {

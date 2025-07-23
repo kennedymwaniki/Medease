@@ -117,6 +117,7 @@ export interface Prescription {
   status: PrescriptionStatus
   startDate: Date
   endDate: Date
+  isPaid: boolean
   patient: Patient
   payment?: Payment
   medication: Medication
@@ -539,4 +540,17 @@ export interface DoctorTimeSlot {
 export enum TimeSlotStatus {
   AVAILABLE = 'available',
   BOOKED = 'booked',
+}
+
+export interface PaystackPushResponse {
+  message: string
+  data: {
+    status: boolean
+    message: string
+    data: {
+      authorization_url: string
+      access_code: string
+      reference: string
+    }
+  }
 }

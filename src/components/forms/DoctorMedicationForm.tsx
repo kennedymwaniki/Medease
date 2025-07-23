@@ -78,7 +78,11 @@ const validateField = <T,>(value: T, schema: z.ZodType<T>) => {
   return undefined
 }
 
-function MedicationForm() {
+interface MedicationFormProps {
+  onSuccess?: () => void
+}
+
+function MedicationForm({ onSuccess }: MedicationFormProps) {
   const { addMedication, error } = useCreateMedication()
   const form = useForm({
     defaultValues: {
@@ -103,8 +107,10 @@ function MedicationForm() {
         console.error('Error creating medication:', error)
       } else {
         console.log('Medication created successfully:', value)
+        form.reset()
+        // Call onSuccess callback to close modal and refresh data
+        onSuccess?.()
       }
-      form.reset()
     },
   })
 
