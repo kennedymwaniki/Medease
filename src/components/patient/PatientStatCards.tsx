@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import React from 'react'
-import { Activity, Bell, Calendar, Pill } from 'lucide-react'
+import { Activity, Bell, Calendar, DollarSignIcon, Pill } from 'lucide-react'
 import { usePatient } from '@/hooks/usePatients'
 import { useAuthStore } from '@/store/authStore'
 
@@ -23,6 +23,10 @@ const PatientStatCard: React.FC = () => {
 
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error loading patient data</div>
+  const totalPayments = patientData?.payments?.reduce(
+    (acc, payment) => acc + (payment.amount ?? 0),
+    0,
+  )
 
   const statData: Array<StatCardData> = [
     {
@@ -33,11 +37,20 @@ const PatientStatCard: React.FC = () => {
       bgColor: 'bg-blue-50',
       iconColor: 'text-blue-600',
     },
+    // {
+    //   icon: <Pill size={24} />,
+    //   title: 'Active Prescriptions',
+    //   number: patientData?.prescriptions.length.toString() ?? '0',
+    //   subtitle: 'All up to date',
+    //   bgColor: 'bg-green-50',
+    //   iconColor: 'text-green-600',
+    // },
     {
-      icon: <Pill size={24} />,
-      title: 'Active Prescriptions',
-      number: patientData?.prescriptions.length.toString() ?? '0',
-      subtitle: 'All up to date',
+      // total payments
+      icon: <DollarSignIcon size={24} />,
+      title: 'Total Payments',
+      number: patientData?.payments.length.toString() ?? '0',
+      subtitle: `total: $${totalPayments?.toFixed(2) ?? '0.00'}`,
       bgColor: 'bg-green-50',
       iconColor: 'text-green-600',
     },

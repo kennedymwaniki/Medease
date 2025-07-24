@@ -1,9 +1,8 @@
-import React from 'react'
 import { useForm } from '@tanstack/react-form'
+import React from 'react'
 import { z } from 'zod'
-import { usePatient, useUpdatePatientProfile } from '@/hooks/usePatients'
-import { useUpdateUser } from '@/hooks/useUser'
 import { useAuthStore } from '@/store/authStore'
+import { useUpdatePatientProfile } from '@/hooks/usePatients'
 
 // Zod schema for patient profile form validation
 const patientProfileSchema = z.object({

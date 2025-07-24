@@ -1,7 +1,5 @@
-import { useState } from 'react'
 import {
   Building,
-  Calendar,
   Camera,
   CheckCircle,
   Clock,
@@ -13,13 +11,14 @@ import {
   UserCircle,
   XCircle,
 } from 'lucide-react'
-import { useDoctor } from '@/hooks/useDoctors'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import uploadFile from '@/lib/uploads'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useDoctor } from '@/hooks/useDoctors'
 import { useUpdateUser } from '@/hooks/useUser'
+import uploadFile from '@/lib/uploads'
 import { useAuthStore } from '@/store/authStore'
 
 const DoctorProfile = () => {

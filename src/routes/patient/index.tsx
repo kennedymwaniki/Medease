@@ -9,9 +9,9 @@ export const Route = createFileRoute('/patient/')({
 
 function RouteComponent() {
   return (
-    <div className="flex flex-col max-w-8xl mx-auto">
+    <div className="flex flex-col gap-4 max-w-8xl mx-auto bg-slate-100 p-4">
       <PatientStatCard />
-      <div className="flex gap-6 mt-6">
+      <div className="flex mt-6">
         <div className="flex-1">
           <PatientPrescriptions />
         </div>

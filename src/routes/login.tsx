@@ -2,7 +2,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { GalleryVerticalEnd } from 'lucide-react'
 import { LoginForm } from '@/components/login-form'
-import { useLogin } from '@/hooks/useAuth'
 
 export const Route = createFileRoute('/login')({
   component: RouteComponent,

@@ -1,3 +1,4 @@
+import React, { useMemo, useState } from 'react'
 import {
   createColumnHelper,
   flexRender,
@@ -7,45 +8,17 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp, CreditCard } from 'lucide-react'
-import React, { useMemo, useState } from 'react'
-import { toast } from 'sonner'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import type {
   ColumnFiltersState,
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
-import { useAuthStore } from '@/store/authStore'
-import { usePaymentsPaystack } from '@/hooks/usePayments'
+import type { Payment } from '@/types/types'
 import { usePatient } from '@/hooks/usePatients'
+import { useAuthStore } from '@/store/authStore'
 
-interface PatientPrescription {
-  id: number
-  medicationName: string
-  dosage: string
-  frequency: string
-  status: string
-  startDate: Date
-  endDate: Date
-  isPaid: boolean
-}
-
-const PatientPrescriptionTable: React.FC = () => {
-  const user = useAuthStore((state) => state.user)
-  const userEmail = user?.email || ''
-
-  const { payStackPaymentAsync, isPending, paymentError } =
-    usePaymentsPaystack()
-
-  // console.log('User from auth store:', user)
-  const patientId = Number(user?.patient?.id)
-  const {
-    data: patientData,
-    isLoading,
-    error: patienterror,
-  } = usePatient(patientId)
-  // console.log('Patient Data for prescriptions:', patientData)
-
+const PatientPaymentsTable: React.FC = () => {
   const [search, setSearch] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -54,54 +27,22 @@ const PatientPrescriptionTable: React.FC = () => {
     pageSize: 10,
   })
 
-  const columnHelper = createColumnHelper<PatientPrescription>()
+  const user = useAuthStore((state) => state.user)
+  const patientId = Number(user?.patient?.id)
 
-  const handlePayment = async (prescriptionId: number) => {
-    const amount = 1000 // Example amount, replace with actual logic to get amount
-    console.log('Payment initialized')
+  const { data: patientData, isLoading, error } = usePatient(patientId)
 
-    try {
-      toast.success(
-        `Payment initialized for prescription ID: ${prescriptionId}`,
-        {
-          description: `Processing payment for prescription ID: ${prescriptionId}`,
-        },
-      )
-
-      const result = await payStackPaymentAsync({
-        email: userEmail,
-        amount,
-        prescriptionId,
-      })
-      console.log('Payment result from paystack:', result.data)
-
-      if (result.data.data.authorization_url) {
-        window.location.href = result.data.data.authorization_url
-      }
-      toast.success('Payment successful! Redirecting to payment page...')
-    } catch (error) {
-      console.error('Payment failed:', error)
-      toast.error('Payment failed. Please try again.')
-    }
-  }
+  const columnHelper = createColumnHelper<Payment>()
 
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
         header: 'ID',
         cell: (info) => info.getValue(),
-        size: 80,
+        size: 50,
       }),
-      columnHelper.accessor('medicationName', {
-        header: 'Medication',
-        cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span className="font-medium text-gray-900">{info.getValue()}</span>
-          </div>
-        ),
-      }),
-      columnHelper.accessor('dosage', {
-        header: 'Dosage',
+      columnHelper.accessor('method', {
+        header: 'Payment Method',
         cell: (info) => (
           <div className="max-w-xs truncate" title={info.getValue()}>
             <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
@@ -110,12 +51,12 @@ const PatientPrescriptionTable: React.FC = () => {
           </div>
         ),
       }),
-      columnHelper.accessor('frequency', {
-        header: 'Frequency',
+      columnHelper.accessor('amount', {
+        header: 'Amount',
         cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
-              {info.getValue()}
+          <div className="max-w-xs truncate" title={`$${info.getValue()}`}>
+            <span className="font-medium text-green-600">
+              ${info.getValue().toLocaleString()}
             </span>
           </div>
         ),
@@ -126,14 +67,14 @@ const PatientPrescriptionTable: React.FC = () => {
           <div className="max-w-xs truncate" title={info.getValue()}>
             <span
               className={`px-2 py-1 rounded-full text-xs font-medium ${
-                info.getValue().toLowerCase() === 'active'
+                info.getValue().toLowerCase() === 'completed'
                   ? 'bg-green-100 text-green-800'
-                  : info.getValue().toLowerCase() === 'completed'
-                    ? 'bg-blue-100 text-blue-800'
-                    : info.getValue().toLowerCase() === 'cancelled'
+                  : info.getValue().toLowerCase() === 'pending'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : info.getValue().toLowerCase() === 'failed'
                       ? 'bg-red-100 text-red-800'
-                      : info.getValue().toLowerCase() === 'paused'
-                        ? 'bg-yellow-100 text-yellow-800'
+                      : info.getValue().toLowerCase() === 'refunded'
+                        ? 'bg-purple-100 text-purple-800'
                         : 'bg-gray-100 text-gray-800'
               }`}
             >
@@ -142,76 +83,37 @@ const PatientPrescriptionTable: React.FC = () => {
           </div>
         ),
       }),
-      columnHelper.accessor('isPaid', {
-        header: 'Payment Status',
+      columnHelper.accessor('transactionId', {
+        header: 'Transaction ID',
         cell: (info) => (
-          <div className="max-w-xs truncate">
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                info.getValue()
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
-              }`}
-            >
-              {info.getValue() ? 'Paid' : 'Unpaid'}
+          <div className="max-w-md truncate" title={info.getValue()}>
+            <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+              {info.getValue()}
             </span>
           </div>
         ),
       }),
-      columnHelper.accessor('startDate', {
-        header: 'Start Date',
+      columnHelper.accessor('prescription.medicationName', {
+        header: 'Medication',
+        cell: (info) => (
+          <div className="max-w-md truncate" title={info.getValue()}>
+            <span className="font-medium">{info.getValue()}</span>
+          </div>
+        ),
+      }),
+      columnHelper.accessor('paymentDate', {
+        header: 'Payment Date',
         cell: (info) => {
           const date = new Date(info.getValue())
           return (
-            <div className="max-w-xs truncate" title={date.toDateString()}>
+            <div className="max-w-xs truncate" title={date.toLocaleString()}>
               {date.toLocaleDateString()}
             </div>
           )
         },
-      }),
-      columnHelper.accessor('endDate', {
-        header: 'End Date',
-        cell: (info) => {
-          const date = new Date(info.getValue())
-          return (
-            <div className="max-w-xs truncate" title={date.toDateString()}>
-              {date.toLocaleDateString()}
-            </div>
-          )
-        },
-      }),
-      columnHelper.display({
-        id: 'actions',
-        header: 'Actions',
-        cell: (info) => {
-          const isPaid = info.row.original.isPaid
-          const isDisabled = isPaid || isPending
-
-          return (
-            <div className="flex justify-center">
-              <button
-                disabled={isDisabled}
-                onClick={() => !isPaid && handlePayment(info.row.original.id)}
-                className={`flex items-center gap-1 px-3 py-1 text-white text-xs font-medium rounded transition-colors focus:outline-none focus:ring-2 ${
-                  isPaid
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : isDisabled
-                      ? 'bg-green-400 cursor-not-allowed'
-                      : 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
-                }`}
-                title={isPaid ? 'Already Paid' : 'Pay for Prescription'}
-              >
-                <CreditCard className="w-3 h-3" />
-                {isPaid ? 'Paid' : isPending ? 'Paying.....' : 'Pay Now'}
-              </button>
-            </div>
-          )
-        },
-        size: 100,
-        enableSorting: false,
       }),
     ],
-    [columnHelper, isPending],
+    [columnHelper],
   )
 
   // Global filter function
@@ -221,22 +123,20 @@ const PatientPrescriptionTable: React.FC = () => {
       const rowData = row.original
 
       return (
-        rowData.medicationName?.toLowerCase().includes(searchValue) ||
-        rowData.dosage?.toLowerCase().includes(searchValue) ||
-        rowData.frequency?.toLowerCase().includes(searchValue) ||
+        rowData.method?.toLowerCase().includes(searchValue) ||
         rowData.status?.toLowerCase().includes(searchValue) ||
-        rowData.id?.toString().includes(searchValue)
+        rowData.transactionId?.toLowerCase().includes(searchValue) ||
+        rowData.prescription?.medicationName
+          ?.toLowerCase()
+          .includes(searchValue) ||
+        rowData.id?.toString().includes(searchValue) ||
+        rowData.amount?.toString().includes(searchValue)
       )
     }
   }, [])
 
   const table = useReactTable({
-    data:
-      patientData?.prescriptions.map((prescription) => ({
-        ...prescription,
-        startDate: prescription.startDate,
-        endDate: new Date(prescription.endDate),
-      })) || [],
+    data: patientData?.payments || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -256,25 +156,15 @@ const PatientPrescriptionTable: React.FC = () => {
   })
 
   if (isLoading) {
-    return (
-      <div className="p-4 text-blue-600">Loading patient prescriptions...</div>
-    )
+    return <div className="p-4 text-blue-600">Loading patient payments...</div>
   }
 
-  if (patienterror) {
+  if (error) {
     return (
       <div className="p-4 text-red-600">
-        Error fetching patient prescriptions: {patienterror.message}
+        Error fetching patient payments: {error.message}
       </div>
     )
-  }
-
-  if (paymentError) {
-    return <p>An Error Ocurred</p>
-  }
-
-  if (isPending) {
-    return <p>Loading......</p>
   }
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -282,23 +172,25 @@ const PatientPrescriptionTable: React.FC = () => {
   }
 
   return (
-    <div className="p-1">
+    <div className="p-4">
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">
-          Patient Prescriptions
-        </h2>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Payment History
+          </h2>
+        </div>
         <label
           htmlFor="search"
           className="block text-sm font-medium text-gray-700 mb-2"
         >
-          Search Prescriptions:
+          Search Payments:
         </label>
         <input
           id="search"
           type="text"
           value={search}
           onChange={handleSearch}
-          placeholder="Search by medication, dosage, frequency, or status..."
+          placeholder="Search by method, status, transaction ID, or medication..."
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
@@ -360,7 +252,7 @@ const PatientPrescriptionTable: React.FC = () => {
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
-                    className="border border-gray-300 px-6 py-3 text-sm text-gray-900"
+                    className="border border-gray-300 px-4 py-3 text-sm text-gray-900"
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
@@ -373,16 +265,16 @@ const PatientPrescriptionTable: React.FC = () => {
 
       {table.getRowModel().rows.length === 0 && (
         <div className="text-center py-8 text-gray-500">
-          No prescriptions found matching your search.
+          No payments found matching your search.
         </div>
       )}
 
       <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div className="text-sm text-gray-500">
           Showing {table.getRowModel().rows.length} of{' '}
-          {table.getPrePaginationRowModel().rows.length} prescriptions
+          {table.getPrePaginationRowModel().rows.length} payments
           {search &&
-            ` (filtered from ${patientData?.prescriptions.length || 0} total)`}
+            ` (filtered from ${patientData?.payments.length || 0} total)`}
         </div>
 
         <div className="flex items-center gap-2">
@@ -429,4 +321,4 @@ const PatientPrescriptionTable: React.FC = () => {
   )
 }
 
-export default PatientPrescriptionTable
+export default PatientPaymentsTable

@@ -67,7 +67,7 @@ interface RegistrationFormProps {
 }
 
 function RegistrationForm({ onSuccess }: RegistrationFormProps) {
-  const { mutate: registerUser, error } = useRegister()
+  const { mutate: registerUser } = useRegister()
   const form = useForm({
     defaultValues: {
       firstname: '',

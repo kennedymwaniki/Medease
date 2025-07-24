@@ -3,12 +3,7 @@
     "development"
   ],
   "hints": {
-    "axe/name-role-value": [
-      "default",
-      {
-        "button-name": "off"
-      }
-    ],
+    "axe/name-role-value": "off",
     "axe/forms": [
       "default",
       {

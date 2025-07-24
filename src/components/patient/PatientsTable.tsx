@@ -168,7 +168,7 @@ const PatientsTable: React.FC = () => {
 
   // Global filter function
   const globalFilter = useMemo(() => {
-    return (row: any, columnId: string, value: string) => {
+    return (row: any, _columnId: string, value: string) => {
       const searchValue = value.toLowerCase()
       const rowData = row.original
 

@@ -101,7 +101,7 @@ const AppointmentBooking = ({
         patientId,
         time: value.time,
         date: value.date,
-        status: AppointmentStatus.PENDING,
+        status: AppointmentStatus.CONFIRMED,
         duration: value.duration,
         title: value.appointmentType,
       }

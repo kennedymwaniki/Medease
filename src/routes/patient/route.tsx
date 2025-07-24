@@ -5,9 +5,7 @@ import {
   FaFileAlt,
   FaHome,
   FaPrescriptionBottleAlt,
-  FaQuestionCircle,
   FaUser,
-  FaUserMd,
 } from 'react-icons/fa'
 import SideNavigation from '@/components/SideNavigation'
 
@@ -38,11 +36,11 @@ function RouteComponent() {
     //   url: '/patient/doctors',
     //   icon: <FaUserMd />,
     // },
-    // {
-    //   label: 'Payments & Billing',
-    //   url: '/patient/payments',
-    //   icon: <FaCreditCard />,
-    // },
+    {
+      label: 'Payments & Billing',
+      url: '/patient/payments',
+      icon: <FaCreditCard />,
+    },
     {
       label: 'Profile Settings',
       url: '/patient/profile',
@@ -59,7 +57,7 @@ function RouteComponent() {
   return (
     <div className="flex">
       <SideNavigation navItems={navItems} />
-      <div className="flex-1 p-8 max-w-9xl mx-auto">
+      <div className="flex-1 gap-8 max-w-9xl mx-auto">
         <Outlet />
       </div>
     </div>

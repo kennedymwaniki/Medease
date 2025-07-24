@@ -1,4 +1,3 @@
-import React, { useMemo, useState } from 'react'
 import {
   createColumnHelper,
   flexRender,
@@ -9,12 +8,12 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
 import type {
   ColumnFiltersState,
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
-import type { Doctor } from '@/types/types'
 import { useDoctor } from '@/hooks/useDoctors'
 import { useAuthStore } from '@/store/authStore'
 
@@ -132,7 +131,7 @@ const DoctorPrescriptionsTable: React.FC = () => {
 
   // Global filter function
   const globalFilter = useMemo(() => {
-    return (row: any, columnId: string, value: string) => {
+    return (row: any, _columnId: string, value: string) => {
       const searchValue = value.toLowerCase()
       const rowData = row.original
 

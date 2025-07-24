@@ -21,7 +21,7 @@ const SideNavigation = ({
   }
 
   return (
-    <div className="h-screen bg-white/20 shadow-2xl w-64 flex flex-col">
+    <div className="h-screen bg-slate-50 shadow-2xl w-64 flex flex-col">
       <div className="p-4 flex-1">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10  rounded-lg flex items-center justify-center">

@@ -35,7 +35,7 @@ const PatientPrescriptions = () => {
   const prescriptions = patientData?.prescriptions || []
 
   // Group prescriptions by status
-  const activePrescriptions = prescriptions.filter((p) => p.status === 'active')
+  //  const activePrescriptions = prescriptions.filter((p) => p.status === 'active')
   const lowStockPrescriptions = prescriptions.filter((p) => {
     // For demonstration, we'll consider prescriptions with less than 10 days remaining as low stock
     const endDate = new Date(p.endDate)

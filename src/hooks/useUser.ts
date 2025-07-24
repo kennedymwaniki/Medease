@@ -18,7 +18,7 @@ export const useUser = (userId: number) => {
     queryFn: () => getUser(userId),
   })
 
-  return { data, isLoading, error }
+  return { data, isLoading, error, refetch }
 }
 export const useDeleteUser = () => {
   const queryClient = useQueryClient()

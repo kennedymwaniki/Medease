@@ -95,7 +95,8 @@ const PrescriptionsTable = () => {
       columnHelper.accessor('startDate', {
         header: 'Start Date',
         cell: (info) => {
-          const date = new Date(info.getValue())
+          const value = info.getValue()
+          const date = new Date(value)
           return (
             <div className="max-w-xs truncate" title={date.toDateString()}>
               {date.toLocaleDateString()}
@@ -117,7 +118,10 @@ const PrescriptionsTable = () => {
       columnHelper.accessor('patient.name', {
         header: 'Patient',
         cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
+          <div
+            className="max-w-xs truncate"
+            title={info.getValue() ?? undefined}
+          >
             <span className="font-medium text-gray-900">{info.getValue()}</span>
           </div>
         ),
@@ -147,7 +151,7 @@ const PrescriptionsTable = () => {
 
   // Global filter function
   const globalFilter = useMemo(() => {
-    return (row: any, columnId: string, value: string) => {
+    return (row: any, _columnId: string, value: string) => {
       const searchValue = value.toLowerCase()
       const rowData = row.original
 

@@ -1,18 +1,12 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import {
-  FaBell,
   FaCalendarAlt,
   FaChartBar,
   FaCog,
-  FaCreditCard,
-  FaFileAlt,
   FaHome,
   FaPills,
   FaPrescriptionBottleAlt,
-  FaSignOutAlt,
   FaUserCog,
-  FaUserMd,
-  FaUsers,
 } from 'react-icons/fa'
 import AdminSideNavigation from '@/components/AdminSideNavigation'
 // import App from '@/components/App'

@@ -1,21 +1,19 @@
-import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
 import ModelClient from '@azure-rest/ai-inference'
 import { AzureKeyCredential } from '@azure/core-auth'
 import { createSseStream } from '@azure/core-sse'
+import { motion } from 'framer-motion'
 import {
   AlertCircle,
   Bot,
   Calendar,
   FileText,
-  FlaskConical,
   Heart,
   Phone,
   Pill,
-  Presentation,
   Send,
   Users,
 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import AppointmentBooking from './patient/AppointmentBooking'
 
 export const VITE_API_KEY = import.meta.env.VITE_API_KEY!
@@ -79,7 +77,7 @@ const MedEaseAssistant = () => {
     },
   ])
   const [inputMessage, setInputMessage] = useState('')
-  const [isOnline, setIsOnline] = useState(true)
+  const [isOnline, _setIsOnline] = useState(true)
   const [showAppointmentBooking, setShowAppointmentBooking] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)

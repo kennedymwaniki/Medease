@@ -163,7 +163,7 @@ const DoctorAppointmentForm = ({
   // Filter patients based on search term
   const filteredPatients =
     patients?.filter((patient) =>
-      patient.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      patient.name?.toLowerCase().includes(searchTerm.toLowerCase()),
     ) || []
 
   const handlePatientSelect = (patient: Patient) => {
@@ -222,7 +222,7 @@ const DoctorAppointmentForm = ({
           {patient.user.imagelink ? (
             <img
               src={patient.user.imagelink}
-              alt={patient.name}
+              alt={patient.name ?? undefined}
               className="w-16 h-16 rounded-full object-cover"
             />
           ) : (
@@ -289,7 +289,7 @@ const DoctorAppointmentForm = ({
             {selectedPatient?.user.imagelink ? (
               <img
                 src={selectedPatient.user.imagelink}
-                alt={selectedPatient.name}
+                alt={selectedPatient.name ?? 'patient'}
                 className="w-16 h-16 rounded-full object-cover"
               />
             ) : (
@@ -537,7 +537,7 @@ const DoctorAppointmentForm = ({
                   {selectedPatient?.user.imagelink ? (
                     <img
                       src={selectedPatient.user.imagelink}
-                      alt={selectedPatient.name}
+                      alt={selectedPatient.name ?? 'Patient'}
                       className="w-16 h-16 rounded-full object-cover"
                     />
                   ) : (

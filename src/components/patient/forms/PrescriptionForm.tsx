@@ -1,7 +1,7 @@
-import React from 'react'
+// import React from 'react'
 
-const PrescriptionForm = () => {
-  return <div></div>
-}
+// const PrescriptionForm = () => {
+//   return <div></div>
+// }
 
-export default PrescriptionForm
+// export default PrescriptionForm

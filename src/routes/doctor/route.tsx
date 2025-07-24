@@ -3,13 +3,10 @@ import {
   FaCalendarAlt,
   FaChartBar,
   FaCog,
-  FaFileAlt,
-  FaPills,
   FaPrescriptionBottleAlt,
   FaUserCircle,
   FaUsers,
 } from 'react-icons/fa'
-import SideNavigation from '@/components/SideNavigation'
 import DoctorSideNavigation from '@/components/Doctors/DoctorSideNavigation'
 
 export const Route = createFileRoute('/doctor')({
