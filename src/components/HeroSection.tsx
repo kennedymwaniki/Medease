@@ -65,7 +65,7 @@ const HeroSection = () => {
           <div className="relative order-1 lg:order-2 bg-white rounded-3xl  shadow-xl">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl">
               <img
-                src="public/HeroImage.png"
+                src="/HeroImage.png"
                 alt="Doctor with family"
                 className="w-full h-96 lg:h-[600px] object-cover"
               />

@@ -10,7 +10,7 @@ const NavBar = () => {
             <div className="flex-shrink-0 flex items-center">
               <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center">
                 <img
-                  src="/public/Medease-logo.png"
+                  src="/Medease-logo.png"
                   alt="MedEase Logo"
                   className="w-8 h-8"
                 />
