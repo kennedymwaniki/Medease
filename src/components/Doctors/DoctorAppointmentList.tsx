@@ -35,18 +35,18 @@ const DoctorAppointmentList = () => {
     return `${hour12}:${minutes} ${ampm}`
   }
 
-  const getStatusColor = (status: any) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-blue-100 text-blue-800'
-      case 'completed':
-        return 'bg-green-100 text-green-800'
-      case 'cancelled':
-        return 'bg-red-100 text-red-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
-  }
+  // const getStatusColor = (status: any) => {
+  //   switch (status) {
+  //     case 'pending':
+  //       return 'bg-blue-100 text-blue-800'
+  //     case 'completed':
+  //       return 'bg-green-100 text-green-800'
+  //     case 'cancelled':
+  //       return 'bg-red-100 text-red-800'
+  //     default:
+  //       return 'bg-gray-100 text-gray-800'
+  //   }
+  // }
 
   const getPatientInitials = (title: string) => {
     // Generate initials from appointment title or use generic ones
@@ -57,7 +57,7 @@ const DoctorAppointmentList = () => {
     return 'PT'
   }
 
-  const getPatientName = (appointment: Appointment, index: number) => {
+  const getPatientName = (index: number) => {
     // Generate patient names based on appointment type and index
     const names = [
       'Emily Davis',
@@ -152,7 +152,7 @@ const DoctorAppointmentList = () => {
         ) : (
           sortedAppointments.map((appointment, index) => {
             const status = getAppointmentStatus(appointment, index)
-            const patientName = getPatientName(appointment, index)
+            const patientName = getPatientName(index)
             const initials = getPatientInitials(appointment.title)
 
             return (
