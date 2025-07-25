@@ -27,15 +27,14 @@ const DepartmentsSection = () => {
       description:
         'Offering specialized skin care treatments for all age groups, ensuring healthy.',
       bgImage:
-        'https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+        'https://images.unsplash.com/photo-1713085085470-fba013d67e65?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
       size: 'small',
     },
     {
       title: 'Gynecology & Obstetrics',
       description:
         "Comprehensive women's health services and expert maternity care.",
-      bgImage:
-        'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+      bgImage: '/public/gynecology2.png',
       size: 'small',
     },
   ]

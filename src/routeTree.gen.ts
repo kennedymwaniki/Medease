@@ -32,11 +32,13 @@ import { Route as PatientPaymentsRouteImport } from './routes/patient/payments'
 import { Route as PatientMedicationRouteImport } from './routes/patient/medication'
 import { Route as PatientMedicalHistoryRouteImport } from './routes/patient/medical-history'
 import { Route as PatientDoctorsRouteImport } from './routes/patient/doctors'
+import { Route as PatientChatRouteImport } from './routes/patient/chat'
 import { Route as PatientAppointmentsRouteImport } from './routes/patient/appointments'
 import { Route as DoctorProfileRouteImport } from './routes/doctor/profile'
 import { Route as DoctorPrescriptionsRouteImport } from './routes/doctor/prescriptions'
 import { Route as DoctorPatientsRouteImport } from './routes/doctor/patients'
 import { Route as DoctorMedicalHistoryRouteImport } from './routes/doctor/medical-history'
+import { Route as DoctorChatRouteImport } from './routes/doctor/chat'
 import { Route as DoctorAppointmentsRouteImport } from './routes/doctor/appointments'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
@@ -165,6 +167,11 @@ const PatientDoctorsRoute = PatientDoctorsRouteImport.update({
   path: '/doctors',
   getParentRoute: () => PatientRouteRoute,
 } as any)
+const PatientChatRoute = PatientChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => PatientRouteRoute,
+} as any)
 const PatientAppointmentsRoute = PatientAppointmentsRouteImport.update({
   id: '/appointments',
   path: '/appointments',
@@ -188,6 +195,11 @@ const DoctorPatientsRoute = DoctorPatientsRouteImport.update({
 const DoctorMedicalHistoryRoute = DoctorMedicalHistoryRouteImport.update({
   id: '/medical-history',
   path: '/medical-history',
+  getParentRoute: () => DoctorRouteRoute,
+} as any)
+const DoctorChatRoute = DoctorChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => DoctorRouteRoute,
 } as any)
 const DoctorAppointmentsRoute = DoctorAppointmentsRouteImport.update({
@@ -277,11 +289,13 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/doctor/appointments': typeof DoctorAppointmentsRoute
+  '/doctor/chat': typeof DoctorChatRoute
   '/doctor/medical-history': typeof DoctorMedicalHistoryRoute
   '/doctor/patients': typeof DoctorPatientsRoute
   '/doctor/prescriptions': typeof DoctorPrescriptionsRoute
   '/doctor/profile': typeof DoctorProfileRoute
   '/patient/appointments': typeof PatientAppointmentsRoute
+  '/patient/chat': typeof PatientChatRoute
   '/patient/doctors': typeof PatientDoctorsRoute
   '/patient/medical-history': typeof PatientMedicalHistoryRoute
   '/patient/medication': typeof PatientMedicationRoute
@@ -316,11 +330,13 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/doctor/appointments': typeof DoctorAppointmentsRoute
+  '/doctor/chat': typeof DoctorChatRoute
   '/doctor/medical-history': typeof DoctorMedicalHistoryRoute
   '/doctor/patients': typeof DoctorPatientsRoute
   '/doctor/prescriptions': typeof DoctorPrescriptionsRoute
   '/doctor/profile': typeof DoctorProfileRoute
   '/patient/appointments': typeof PatientAppointmentsRoute
+  '/patient/chat': typeof PatientChatRoute
   '/patient/doctors': typeof PatientDoctorsRoute
   '/patient/medical-history': typeof PatientMedicalHistoryRoute
   '/patient/medication': typeof PatientMedicationRoute
@@ -359,11 +375,13 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/doctor/appointments': typeof DoctorAppointmentsRoute
+  '/doctor/chat': typeof DoctorChatRoute
   '/doctor/medical-history': typeof DoctorMedicalHistoryRoute
   '/doctor/patients': typeof DoctorPatientsRoute
   '/doctor/prescriptions': typeof DoctorPrescriptionsRoute
   '/doctor/profile': typeof DoctorProfileRoute
   '/patient/appointments': typeof PatientAppointmentsRoute
+  '/patient/chat': typeof PatientChatRoute
   '/patient/doctors': typeof PatientDoctorsRoute
   '/patient/medical-history': typeof PatientMedicalHistoryRoute
   '/patient/medication': typeof PatientMedicationRoute
@@ -403,11 +421,13 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/doctor/appointments'
+    | '/doctor/chat'
     | '/doctor/medical-history'
     | '/doctor/patients'
     | '/doctor/prescriptions'
     | '/doctor/profile'
     | '/patient/appointments'
+    | '/patient/chat'
     | '/patient/doctors'
     | '/patient/medical-history'
     | '/patient/medication'
@@ -442,11 +462,13 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/doctor/appointments'
+    | '/doctor/chat'
     | '/doctor/medical-history'
     | '/doctor/patients'
     | '/doctor/prescriptions'
     | '/doctor/profile'
     | '/patient/appointments'
+    | '/patient/chat'
     | '/patient/doctors'
     | '/patient/medical-history'
     | '/patient/medication'
@@ -484,11 +506,13 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/doctor/appointments'
+    | '/doctor/chat'
     | '/doctor/medical-history'
     | '/doctor/patients'
     | '/doctor/prescriptions'
     | '/doctor/profile'
     | '/patient/appointments'
+    | '/patient/chat'
     | '/patient/doctors'
     | '/patient/medical-history'
     | '/patient/medication'
@@ -681,6 +705,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PatientDoctorsRouteImport
       parentRoute: typeof PatientRouteRoute
     }
+    '/patient/chat': {
+      id: '/patient/chat'
+      path: '/chat'
+      fullPath: '/patient/chat'
+      preLoaderRoute: typeof PatientChatRouteImport
+      parentRoute: typeof PatientRouteRoute
+    }
     '/patient/appointments': {
       id: '/patient/appointments'
       path: '/appointments'
@@ -714,6 +745,13 @@ declare module '@tanstack/react-router' {
       path: '/medical-history'
       fullPath: '/doctor/medical-history'
       preLoaderRoute: typeof DoctorMedicalHistoryRouteImport
+      parentRoute: typeof DoctorRouteRoute
+    }
+    '/doctor/chat': {
+      id: '/doctor/chat'
+      path: '/chat'
+      fullPath: '/doctor/chat'
+      preLoaderRoute: typeof DoctorChatRouteImport
       parentRoute: typeof DoctorRouteRoute
     }
     '/doctor/appointments': {
@@ -839,6 +877,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 
 interface DoctorRouteRouteChildren {
   DoctorAppointmentsRoute: typeof DoctorAppointmentsRoute
+  DoctorChatRoute: typeof DoctorChatRoute
   DoctorMedicalHistoryRoute: typeof DoctorMedicalHistoryRoute
   DoctorPatientsRoute: typeof DoctorPatientsRoute
   DoctorPrescriptionsRoute: typeof DoctorPrescriptionsRoute
@@ -848,6 +887,7 @@ interface DoctorRouteRouteChildren {
 
 const DoctorRouteRouteChildren: DoctorRouteRouteChildren = {
   DoctorAppointmentsRoute: DoctorAppointmentsRoute,
+  DoctorChatRoute: DoctorChatRoute,
   DoctorMedicalHistoryRoute: DoctorMedicalHistoryRoute,
   DoctorPatientsRoute: DoctorPatientsRoute,
   DoctorPrescriptionsRoute: DoctorPrescriptionsRoute,
@@ -861,6 +901,7 @@ const DoctorRouteRouteWithChildren = DoctorRouteRoute._addFileChildren(
 
 interface PatientRouteRouteChildren {
   PatientAppointmentsRoute: typeof PatientAppointmentsRoute
+  PatientChatRoute: typeof PatientChatRoute
   PatientDoctorsRoute: typeof PatientDoctorsRoute
   PatientMedicalHistoryRoute: typeof PatientMedicalHistoryRoute
   PatientMedicationRoute: typeof PatientMedicationRoute
@@ -872,6 +913,7 @@ interface PatientRouteRouteChildren {
 
 const PatientRouteRouteChildren: PatientRouteRouteChildren = {
   PatientAppointmentsRoute: PatientAppointmentsRoute,
+  PatientChatRoute: PatientChatRoute,
   PatientDoctorsRoute: PatientDoctorsRoute,
   PatientMedicalHistoryRoute: PatientMedicalHistoryRoute,
   PatientMedicationRoute: PatientMedicationRoute,

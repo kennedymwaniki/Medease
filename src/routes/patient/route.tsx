@@ -7,6 +7,7 @@ import {
   FaPrescriptionBottleAlt,
   FaUser,
 } from 'react-icons/fa'
+// import { IconRobotFace } from '@tabler/icons-react'
 import SideNavigation from '@/components/SideNavigation'
 
 export const Route = createFileRoute('/patient')({
@@ -42,6 +43,11 @@ function RouteComponent() {
       icon: <FaCreditCard />,
     },
     {
+      label: 'Chat',
+      url: '/patient/chat',
+      icon: <FaUser />,
+    },
+    {
       label: 'Profile Settings',
       url: '/patient/profile',
       icon: <FaUser />,
@@ -57,7 +63,7 @@ function RouteComponent() {
   return (
     <div className="flex">
       <SideNavigation navItems={navItems} />
-      <div className="flex-1 gap-8 max-w-9xl mx-auto">
+      <div className="flex-1 gap-8 max-w-9xl p-8 bg-slate-50 mx-auto">
         <Outlet />
       </div>
     </div>
