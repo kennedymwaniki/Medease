@@ -19,7 +19,7 @@ const DepartmentsSection = () => {
       title: 'Neurology',
       description:
         'Advanced care for brain, spine, and nervous system conditions.',
-      bgImage: '/public/neurology-image.png',
+      bgImage: '/neurology-image.png',
       size: 'center',
     },
     {
@@ -34,7 +34,7 @@ const DepartmentsSection = () => {
       title: 'Gynecology & Obstetrics',
       description:
         "Comprehensive women's health services and expert maternity care.",
-      bgImage: '/public/gynecology2.png',
+      bgImage: '/dermatology2.png',
       size: 'small',
     },
   ]

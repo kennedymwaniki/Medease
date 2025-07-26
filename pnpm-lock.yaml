@@ -35,6 +35,9 @@ importers:
       '@faker-js/faker':
         specifier: ^9.6.0
         version: 9.9.0
+      '@pusher/push-notifications-web':
+        specifier: ^1.1.0
+        version: 1.1.0
       '@radix-ui/react-avatar':
         specifier: ^1.1.10
         version: 1.1.10(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -161,6 +164,9 @@ importers:
       react-player:
         specifier: ^3.2.0
         version: 3.2.0(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react-push-notification:
+        specifier: ^1.5.4
+        version: 1.5.4(react@19.1.0)
       recharts:
         specifier: ^3.0.2
         version: 3.0.2(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react-is@17.0.2)(react@19.1.0)(redux@5.0.1)
@@ -833,6 +839,9 @@ packages:
 
   '@protobuf-ts/twirp-transport@2.11.1':
     resolution: {integrity: sha512-4/C6XzlsHW0pdINO4a+zbhF5fEHWwhUU//ZfGu/7KbtWjPgdJRxFVibbjZP1gKdWWjj8U59NduR3OSsUHElWsA==}
+
+  '@pusher/push-notifications-web@1.1.0':
+    resolution: {integrity: sha512-qR9RZNpH9E54GEpn9uqag9VbLG3kk13DPtf0v4ScsbIZhLFrc1vVWoylzh9zPKiJx3LLwnSxZQA/DkF13OBYXw==}
 
   '@radix-ui/number@1.1.1':
     resolution: {integrity: sha512-MkKCwxlXTgz6CFoJx3pCwn07GKp36+aZyu/u2Ln2VrA5DcdyCZkASEDBTd8x5whTQQL5CiYf4prXKLcgQdv29g==}
@@ -3498,6 +3507,11 @@ packages:
       react: ^16.8.0 || ^17 || ^18
       react-dom: ^16.8.0 || ^17 || ^18
 
+  react-push-notification@1.5.4:
+    resolution: {integrity: sha512-ZsiJfz8dNvfz0ClKcrzaKojIAdYou+s2N2M4Z6EuAlQlBsVqex/Wv0hldgueSLKihmGbZouj/oPih/gy5xlKIQ==}
+    peerDependencies:
+      react: ^16.8.0
+
   react-redux@9.2.0:
     resolution: {integrity: sha512-ROY9fvHhwOD9ySfrF0wmvu//bKCQ6AeZZq1nJNtbDC+kk5DuSuNX/n6YWYF/SYy7bSba4D4FSz8DJeKY/S/r+g==}
     peerDependencies:
@@ -4862,6 +4876,8 @@ snapshots:
     dependencies:
       '@protobuf-ts/runtime': 2.11.1
       '@protobuf-ts/runtime-rpc': 2.11.1
+
+  '@pusher/push-notifications-web@1.1.0': {}
 
   '@radix-ui/number@1.1.1': {}
 
@@ -7777,6 +7793,10 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
       react-fast-compare: 3.2.2
       warning: 4.0.3
+
+  react-push-notification@1.5.4(react@19.1.0):
+    dependencies:
+      react: 19.1.0
 
   react-redux@9.2.0(@types/react@19.1.8)(react@19.1.0)(redux@5.0.1):
     dependencies:
