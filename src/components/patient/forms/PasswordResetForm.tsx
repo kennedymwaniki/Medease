@@ -48,12 +48,9 @@ function PasswordResetForm() {
         setSubmittedEmail(value.email)
         setIsSubmitted(true)
 
-        // In a real app, you would navigate to /otp-verification
-        // For demo purposes, we'll show a success state first
         setTimeout(() => {
           console.log('Redirecting to /otp-verification')
           window.location.href = '/otp-verification'
-          // or using React Router: navigate('/otp-verification')
         }, 2000)
       } catch (error) {
         console.error('Failed to send reset code:', error)
@@ -65,7 +62,7 @@ function PasswordResetForm() {
   const handleBackToLogin = () => {
     console.log('Navigating back to login')
     // Here you would typically navigate to login page
-    // window.location.href = '/login'
+    window.location.href = '/login'
     // or using React Router: navigate('/login')
   }
 

@@ -88,6 +88,7 @@ function OtpVerificationForm2() {
   const handleBackToLogin = () => {
     console.log('Navigating back to login')
     // Here you would typically navigate to login page
+    window.location.href = '/login'
   }
 
   return (
