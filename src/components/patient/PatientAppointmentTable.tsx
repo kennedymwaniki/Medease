@@ -1,4 +1,3 @@
-import React, { useMemo, useState } from 'react'
 import {
   createColumnHelper,
   flexRender,
@@ -8,16 +7,26 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp, Plus, Video } from 'lucide-react'
+import {
+  Calendar,
+  CheckCircle,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Plus,
+  Video,
+  XCircle,
+} from 'lucide-react'
+import React, { useMemo, useState } from 'react'
 import type {
   ColumnFiltersState,
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
-import { usePatient } from '@/hooks/usePatients'
-import { useAuthStore } from '@/store/authStore'
 import Modal from '@/components/Modal'
 import AppointmentBooking from '@/components/patient/AppointmentBooking'
+import { usePatient } from '@/hooks/usePatients'
+import { useAuthStore } from '@/store/authStore'
 
 interface PatientAppointment {
   id: number
@@ -27,6 +36,15 @@ interface PatientAppointment {
   duration: number
   title: string
   user_url?: string | null
+  doctor: {
+    id: number
+    specialization: string
+    user: {
+      firstname: string
+      lastname: string
+      imagelink?: string | null | undefined
+    }
+  }
 }
 
 const PatientAppointmentTable: React.FC = () => {
@@ -35,17 +53,14 @@ const PatientAppointmentTable: React.FC = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 5,
   })
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const user = useAuthStore((state) => state.user)
-
-  console.log('User from auth store:', user)
   const patientId = Number(user?.patient?.id)
 
   const { data: patientData, isLoading, error, refetch } = usePatient(patientId)
-  console.log('Patient Data:', patientData)
 
   const columnHelper = createColumnHelper<PatientAppointment>()
 
@@ -53,98 +68,172 @@ const PatientAppointmentTable: React.FC = () => {
     window.open(userUrl, '_blank')
   }
 
+  const getStatusIcon = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'confirmed':
+        return <CheckCircle className="w-4 h-4" />
+      case 'pending':
+        return <Clock className="w-4 h-4" />
+      case 'cancelled':
+        return <XCircle className="w-4 h-4" />
+      case 'completed':
+        return <CheckCircle className="w-4 h-4" />
+      default:
+        return <Clock className="w-4 h-4" />
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'confirmed':
+        return 'bg-green-50 text-green-700 border border-green-200'
+      case 'pending':
+        return 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+      case 'cancelled':
+        return 'bg-red-50 text-red-700 border border-red-200'
+      case 'completed':
+        return 'bg-blue-50 text-blue-700 border border-blue-200'
+      default:
+        return 'bg-gray-50 text-gray-700 border border-gray-200'
+    }
+  }
+
+  const getTypeIcon = (title: string) => {
+    const typeColors = [
+      'bg-blue-100 text-blue-600',
+      'bg-purple-100 text-purple-600',
+      'bg-green-100 text-green-600',
+      'bg-orange-100 text-orange-600',
+      'bg-pink-100 text-pink-600',
+    ]
+    const index = title.length % typeColors.length
+    return typeColors[index]
+  }
+
   const columns = useMemo(
     () => [
-      columnHelper.accessor('id', {
-        header: 'ID',
-        cell: (info) => info.getValue(),
-        size: 50,
-      }),
-      columnHelper.accessor('date', {
-        header: 'Date',
+      columnHelper.display({
+        id: 'dateTime',
+        header: 'Date & Time',
         cell: (info) => {
-          const date = new Date(info.getValue())
+          const date = new Date(info.row.original.date)
+          const time = info.row.original.time
           return (
-            <div className="max-w-xs truncate" title={date.toDateString()}>
-              {date.toLocaleDateString()}
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <div className="font-medium text-gray-900">
+                  {date.toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </div>
+                <div className="text-sm text-gray-500">{time}</div>
+              </div>
             </div>
           )
         },
       }),
-      columnHelper.accessor('time', {
-        header: 'Time',
+      columnHelper.accessor('title', {
+        header: 'Type',
         cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-              {info.getValue()}
-            </span>
+          <div className="flex items-center space-x-3">
+            <div
+              className={`w-8 h-8 rounded-lg flex items-center justify-center ${getTypeIcon(info.getValue())}`}
+            >
+              <div className="w-3 h-3 rounded-full bg-current"></div>
+            </div>
+            <div>
+              <div className="font-bold text-gray-900">{info.getValue()}</div>
+              <div className="text-sm text-gray-500">
+                {info.row.original.duration} min
+              </div>
+            </div>
           </div>
         ),
+      }),
+      columnHelper.display({
+        id: 'doctor',
+        header: 'Doctor',
+        cell: (info) => {
+          const doctor = info.row.original.doctor
+          const doctorName = `${doctor.user.firstname} ${doctor.user.lastname}`
+          return (
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200">
+                {doctor.user.imagelink ? (
+                  <img
+                    src={doctor.user.imagelink}
+                    alt={doctorName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-5 h-5 bg-gray-400 rounded-full"></div>
+                  </div>
+                )}
+              </div>
+              <div>
+                <div className="font-medium text-gray-900 text-sm">
+                  {doctorName}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {doctor.specialization}
+                </div>
+              </div>
+            </div>
+          )
+        },
       }),
       columnHelper.accessor('status', {
         header: 'Status',
         cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                info.getValue().toLowerCase() === 'confirmed'
-                  ? 'bg-green-100 text-green-800'
-                  : info.getValue().toLowerCase() === 'pending'
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : info.getValue().toLowerCase() === 'cancelled'
-                      ? 'bg-red-100 text-red-800'
-                      : info.getValue().toLowerCase() === 'completed'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-gray-100 text-gray-800'
-              }`}
-            >
-              {info.getValue()}
-            </span>
-          </div>
-        ),
-      }),
-      columnHelper.accessor('duration', {
-        header: 'Duration',
-        cell: (info) => (
           <div
-            className="max-w-xs truncate"
-            title={`${info.getValue()} minutes`}
+            className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(info.getValue())}`}
           >
-            <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
-              {info.getValue()} min
-            </span>
-          </div>
-        ),
-      }),
-      columnHelper.accessor('title', {
-        header: 'Title',
-        cell: (info) => (
-          <div className="max-w-md truncate" title={info.getValue()}>
-            <span className="font-medium">{info.getValue()}</span>
+            {getStatusIcon(info.getValue())}
+            <span className="capitalize">{info.getValue()}</span>
           </div>
         ),
       }),
       columnHelper.accessor('user_url', {
-        header: 'Zoom Meeting',
+        header: 'Join Meeting',
         cell: (info) => {
           const userUrl = info.getValue()
+          const status = info.row.original.status.toLowerCase()
+          const isDisabled = status === 'cancelled' || status === 'completed'
+
           return (
             <div className="flex items-center justify-center">
-              {userUrl ? (
+              {userUrl && !isDisabled ? (
                 <button
                   onClick={() => handleZoomClick(userUrl)}
-                  className="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   title="Join Zoom Meeting"
                 >
                   <Video className="w-4 h-4" />
+                  <span className="text-sm font-medium">Join</span>
+                </button>
+              ) : userUrl && isDisabled ? (
+                <button
+                  disabled
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed"
+                  title="Meeting unavailable"
+                >
+                  <Video className="w-4 h-4" />
+                  <span className="text-sm font-medium">Join</span>
                 </button>
               ) : (
-                <span className="text-gray-400 text-xs">No meeting link</span>
+                <span className="text-gray-400 text-sm">No meeting</span>
               )}
             </div>
           )
         },
-        size: 120,
+        size: 140,
+        enableSorting: false,
       }),
     ],
     [columnHelper],
@@ -161,7 +250,10 @@ const PatientAppointmentTable: React.FC = () => {
         rowData.status?.toLowerCase().includes(searchValue) ||
         rowData.date?.toLowerCase().includes(searchValue) ||
         rowData.time?.toLowerCase().includes(searchValue) ||
-        rowData.id?.toString().includes(searchValue)
+        rowData.id?.toString().includes(searchValue) ||
+        `${rowData.doctor?.user?.firstname} ${rowData.doctor?.user?.lastname}`
+          .toLowerCase()
+          .includes(searchValue)
       )
     }
   }, [])
@@ -188,22 +280,24 @@ const PatientAppointmentTable: React.FC = () => {
 
   const handleAppointmentSuccess = (appointmentDetails: any) => {
     console.log('Appointment booked successfully:', appointmentDetails)
-    // Close the modal
     setIsModalOpen(false)
-    // Refetch the patient data to update the appointments list
     refetch()
   }
 
   if (isLoading) {
     return (
-      <div className="p-4 text-blue-600">Loading patient appointments...</div>
+      <div className="flex items-center justify-center p-8">
+        <div className="text-blue-600">Loading patient appointments...</div>
+      </div>
     )
   }
 
   if (error) {
     return (
-      <div className="p-4 text-red-600">
-        Error fetching patient appointments: {error.message}
+      <div className="flex items-center justify-center p-8">
+        <div className="text-red-600">
+          Error fetching patient appointments: {error.message}
+        </div>
       </div>
     )
   }
@@ -213,52 +307,48 @@ const PatientAppointmentTable: React.FC = () => {
   }
 
   return (
-    <div className="p-4">
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold text-gray-900">
+    <div className="p-6 bg-white">
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-gray-900">
             Patient Appointments
           </h2>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <Plus className="w-4 h-4" />
-            <span>Schedule Appointment</span>
+            <Plus className="w-5 h-5" />
+            <span className="font-medium">Schedule Appointment</span>
           </button>
         </div>
-        <label
-          htmlFor="search"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Search Appointments:
-        </label>
-        <input
-          id="search"
-          type="text"
-          value={search}
-          onChange={handleSearch}
-          placeholder="Search by title, date, time, or status..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
+        <div className="relative">
+          <input
+            id="search"
+            type="text"
+            value={search}
+            onChange={handleSearch}
+            placeholder="Search appointments..."
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+          />
+        </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse border border-gray-300">
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <table className="min-w-full">
           <thead className="bg-gray-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="border border-gray-300 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-4 text-left text-sm font-semibold text-gray-900"
                     style={{ width: header.getSize() }}
                   >
                     {header.isPlaceholder ? null : (
                       <div
                         className={`flex items-center space-x-2 ${
                           header.column.getCanSort()
-                            ? 'cursor-pointer select-none'
+                            ? 'cursor-pointer select-none hover:text-blue-600'
                             : ''
                         }`}
                         onClick={header.column.getToggleSortingHandler()}
@@ -294,14 +384,11 @@ const PatientAppointmentTable: React.FC = () => {
               </tr>
             ))}
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-gray-100">
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50">
+              <tr key={row.id} className="hover:bg-gray-50 transition-colors">
                 {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="border border-gray-300 px-4 py-3 text-sm text-gray-900"
-                  >
+                  <td key={cell.id} className="px-6 py-4 text-sm text-gray-900">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -312,13 +399,14 @@ const PatientAppointmentTable: React.FC = () => {
       </div>
 
       {table.getRowModel().rows.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          No appointments found matching your search.
+        <div className="text-center py-12 text-gray-500">
+          <div className="text-lg font-medium">No appointments found</div>
+          <div>Try adjusting your search criteria</div>
         </div>
       )}
 
-      <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="text-sm text-gray-500">
+      <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="text-sm text-gray-600">
           Showing {table.getRowModel().rows.length} of{' '}
           {table.getPrePaginationRowModel().rows.length} appointments
           {search &&
@@ -329,21 +417,21 @@ const PatientAppointmentTable: React.FC = () => {
           <button
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'<<'}
           </button>
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'<'}
           </button>
 
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1 px-3 py-2">
             <span className="text-sm text-gray-700">Page</span>
-            <strong className="text-sm">
+            <strong className="text-sm font-semibold">
               {table.getState().pagination.pageIndex + 1} of{' '}
               {table.getPageCount()}
             </strong>
@@ -352,14 +440,14 @@ const PatientAppointmentTable: React.FC = () => {
           <button
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'>'}
           </button>
           <button
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'>>'}
           </button>

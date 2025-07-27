@@ -9,7 +9,6 @@ function RouteComponent() {
   return (
     <div>
       <DoctorAppointmentsTable />
-      {/* <DoctorAppointmentForm /> */}
     </div>
   )
 }

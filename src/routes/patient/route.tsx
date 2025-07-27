@@ -9,6 +9,7 @@ import {
 } from 'react-icons/fa'
 // import { IconRobotFace } from '@tabler/icons-react'
 import SideNavigation from '@/components/SideNavigation'
+import { AutoPushNotificationSetup } from '@/components/AutoPushNotificationSetup'
 
 export const Route = createFileRoute('/patient')({
   component: RouteComponent,
@@ -63,9 +64,10 @@ function RouteComponent() {
   return (
     <div className="flex">
       <SideNavigation navItems={navItems} />
-      <div className="flex-1 gap-8 max-w-9xl p-8 bg-slate-50 mx-auto">
+      <div className="flex-1 gap-8 max-w-9xl p-3 bg-slate-50 mx-auto">
         <Outlet />
       </div>
+      <AutoPushNotificationSetup />
     </div>
   )
 }

@@ -1,5 +1,7 @@
 // API Response Types for MedEase Backend
 
+import type { ReactNode } from 'react'
+
 // ===== ENUMS =====
 export enum UserRole {
   ADMIN = 'admin',
@@ -59,6 +61,11 @@ export interface Doctor {
 }
 
 export interface Patient {
+  date: string | number | Date
+  time: any
+  duration: ReactNode
+  doctor: any
+  status: any
   id: number
   name: string | null
   age: number | null
@@ -73,6 +80,7 @@ export interface Patient {
 }
 
 export interface Appointment {
+  zoomMeetingId: string
   id: number
   date: string
   time: string
@@ -110,6 +118,10 @@ export interface MedicationStock {
 }
 
 export interface Prescription {
+  doctor: {
+    id: number
+    user: { firstname: string; lastname: string; imagelink: string }
+  }
   id: number
   frequency: string
   medicationName: string

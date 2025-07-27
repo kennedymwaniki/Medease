@@ -8,7 +8,16 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp, FileText } from 'lucide-react'
+import {
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Phone,
+  Plus,
+  Search,
+  User,
+} from 'lucide-react'
 import type {
   ColumnFiltersState,
   PaginationState,
@@ -51,122 +60,112 @@ const PatientsTable: React.FC = () => {
 
   const handlePrescriptionSuccess = () => {
     handleModalClose()
-    // You can add a success notification here if needed
+  }
+
+  const getGenderColor = (gender: string) => {
+    switch (gender.toLowerCase()) {
+      case 'male':
+        return 'bg-blue-50 text-blue-700 border border-blue-200'
+      case 'female':
+        return 'bg-pink-50 text-pink-700 border border-pink-200'
+      default:
+        return 'bg-gray-50 text-gray-700 border border-gray-200'
+    }
   }
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('id', {
-        header: 'ID',
-        cell: (info) => info.getValue(),
-        size: 50,
-      }),
-      columnHelper.accessor('user.imagelink', {
-        header: 'Image',
-        cell: (info) => (
-          <div className="flex justify-center">
-            <img
-              src={info.getValue() || ''}
-              alt="Patient"
-              className="w-10 h-10 rounded-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = '/api/placeholder/40/40'
-              }}
-            />
-          </div>
-        ),
-        size: 80,
-        enableSorting: false,
-      }),
-      columnHelper.accessor('name', {
-        header: 'Name',
-        cell: (info) => (
-          <div
-            className="max-w-xs truncate font-medium"
-            title={info.getValue() || undefined}
-          >
-            {info.getValue()}
-          </div>
-        ),
+      columnHelper.display({
+        id: 'patient',
+        header: 'Patient',
+        cell: (info) => {
+          const patient = info.row.original
+          return (
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                {patient.user.imagelink ? (
+                  <img
+                    src={patient.user.imagelink}
+                    alt={patient.name ?? 'Patient'}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="w-5 h-5 text-gray-500" />
+                )}
+              </div>
+              <div>
+                <div className="font-medium text-gray-900">{patient.name}</div>
+                <div className="text-sm text-gray-500">ID: {patient.id}</div>
+              </div>
+            </div>
+          )
+        },
+        size: 220,
       }),
       columnHelper.accessor('age', {
         header: 'Age',
         cell: (info) => (
-          <div className="max-w-xs truncate" title={`${info.getValue()} years`}>
-            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-              {info.getValue()} yrs
-            </span>
+          <div className="text-center">
+            <div className="font-bold text-gray-900">{info.getValue()}</div>
+            <div className="text-xs text-gray-500">years</div>
           </div>
         ),
+        size: 80,
       }),
       columnHelper.accessor('gender', {
         header: 'Gender',
         cell: (info) => (
           <div
-            className="max-w-xs truncate"
-            title={info.getValue() || 'unknown'}
+            className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${getGenderColor(info.getValue() ?? '')}`}
           >
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                info.getValue()?.toLowerCase() === 'male'
-                  ? 'bg-blue-100 text-blue-800'
-                  : info.getValue()?.toLowerCase() === 'female'
-                    ? 'bg-pink-100 text-pink-800'
-                    : 'bg-gray-100 text-gray-800'
-              }`}
-            >
-              {info.getValue() ?? 'To be specified'}
-            </span>
+            <span className="capitalize">{info.getValue() ?? 'Unknown'}</span>
           </div>
         ),
+        size: 120,
       }),
       columnHelper.accessor('contact', {
         header: 'Contact',
         cell: (info) => (
-          <div
-            className="max-w-xs truncate"
-            title={info.getValue() || undefined}
-          >
-            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-              {info.getValue() ?? '.......'}
+          <div className="flex items-center space-x-2">
+            <Phone className="w-4 h-4 text-green-600" />
+            <span className="text-gray-900">
+              {info.getValue() ?? 'Not provided'}
             </span>
           </div>
         ),
+        size: 160,
       }),
       columnHelper.accessor('address', {
         header: 'Address',
         cell: (info) => (
           <div
-            className="max-w-md truncate"
-            title={info.getValue() || undefined}
+            className="text-gray-700 line-clamp-1"
+            title={info.getValue() ?? ''}
           >
-            <span className="text-gray-700">{info.getValue()}</span>
+            {info.getValue() ?? 'Not provided'}
           </div>
         ),
+        size: 200,
       }),
       columnHelper.display({
         id: 'actions',
         header: 'Actions',
         cell: (info) => (
-          <div className="flex justify-center">
-            <button
-              onClick={() => handleAssignPrescription(info.row.original)}
-              className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-              title="Assign Prescription"
-            >
-              <FileText className="w-3 h-3" />
-              Assign Prescription
-            </button>
-          </div>
+          <button
+            onClick={() => handleAssignPrescription(info.row.original)}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium"
+          >
+            <FileText className="w-4 h-4" />
+            Prescribe
+          </button>
         ),
-        size: 10,
+        size: 140,
         enableSorting: false,
       }),
     ],
     [columnHelper],
   )
 
-  // Global filter function
   const globalFilter = useMemo(() => {
     return (row: any, _columnId: string, value: string) => {
       const searchValue = value.toLowerCase()
@@ -204,13 +203,19 @@ const PatientsTable: React.FC = () => {
   })
 
   if (isLoading) {
-    return <div className="p-4 text-blue-600">Loading patients...</div>
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-blue-600">Loading patients...</div>
+      </div>
+    )
   }
 
   if (error) {
     return (
-      <div className="p-4 text-red-600">
-        Error fetching patients: {error.message}
+      <div className="flex items-center justify-center p-8">
+        <div className="text-red-600">
+          Error fetching patients: {error.message}
+        </div>
       </div>
     )
   }
@@ -220,41 +225,41 @@ const PatientsTable: React.FC = () => {
   }
 
   return (
-    <div className="p-4">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">Patients</h2>
-        <label
-          htmlFor="search"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Search Patients:
-        </label>
-        <input
-          id="search"
-          type="text"
-          value={search}
-          onChange={handleSearch}
-          placeholder="Search by name, gender, contact, address, or age..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
+    <div className="p-6 bg-white">
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-gray-900">Patients List</h2>
+        </div>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            value={search}
+            onChange={handleSearch}
+            placeholder="Search patients by name, contact, address..."
+            className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+          />
+        </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse border border-gray-300">
+      <div className="bg-white  shadow-sm overflow-hidden">
+        <table className="min-w-full">
           <thead className="bg-gray-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="border border-gray-300 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-4 text-left text-sm font-semibold text-gray-900"
                     style={{ width: header.getSize() }}
                   >
                     {header.isPlaceholder ? null : (
                       <div
                         className={`flex items-center space-x-2 ${
                           header.column.getCanSort()
-                            ? 'cursor-pointer select-none'
+                            ? 'cursor-pointer select-none hover:text-blue-600'
                             : ''
                         }`}
                         onClick={header.column.getToggleSortingHandler()}
@@ -290,14 +295,11 @@ const PatientsTable: React.FC = () => {
               </tr>
             ))}
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-gray-100">
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50">
+              <tr key={row.id} className="hover:bg-gray-50 transition-colors">
                 {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="border border-gray-300 px-4 py-3 text-sm text-gray-900"
-                  >
+                  <td key={cell.id} className="px-6 py-4 text-sm text-gray-900">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -308,13 +310,14 @@ const PatientsTable: React.FC = () => {
       </div>
 
       {table.getRowModel().rows.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          No patients found matching your search.
+        <div className="text-center py-12 text-gray-500">
+          <div className="text-lg font-medium">No patients found</div>
+          <div>Try adjusting your search criteria</div>
         </div>
       )}
 
-      <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="text-sm text-gray-500">
+      <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="text-sm text-gray-600">
           Showing {table.getRowModel().rows.length} of{' '}
           {table.getPrePaginationRowModel().rows.length} patients
           {search && ` (filtered from ${patientsData?.length || 0} total)`}
@@ -324,21 +327,21 @@ const PatientsTable: React.FC = () => {
           <button
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'<<'}
           </button>
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'<'}
           </button>
 
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1 px-3 py-2">
             <span className="text-sm text-gray-700">Page</span>
-            <strong className="text-sm">
+            <strong className="text-sm font-semibold">
               {table.getState().pagination.pageIndex + 1} of{' '}
               {table.getPageCount()}
             </strong>
@@ -347,21 +350,20 @@ const PatientsTable: React.FC = () => {
           <button
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'>'}
           </button>
           <button
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'>>'}
           </button>
         </div>
       </div>
 
-      {/* Prescription Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={handleModalClose}

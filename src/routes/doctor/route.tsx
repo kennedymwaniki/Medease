@@ -8,6 +8,7 @@ import {
   FaUsers,
 } from 'react-icons/fa'
 import DoctorSideNavigation from '@/components/Doctors/DoctorSideNavigation'
+import { AutoPushNotificationSetup } from '@/components/AutoPushNotificationSetup'
 
 export const Route = createFileRoute('/doctor')({
   component: RouteComponent,
@@ -44,7 +45,7 @@ function RouteComponent() {
     // },
     {
       label: 'Settings',
-      url: '/doctor/settings',
+      url: '/doctor/setting',
       icon: <FaCog />,
     },
     // profile
@@ -58,9 +59,10 @@ function RouteComponent() {
   return (
     <div className="flex">
       <DoctorSideNavigation navItems={navItems} />
-      <div className="flex-1">
+      <div className="flex-1 gap-8 max-w-9xl p-3 bg-slate-50 mx-auto">
         <Outlet />
       </div>
+      <AutoPushNotificationSetup />
     </div>
   )
 }

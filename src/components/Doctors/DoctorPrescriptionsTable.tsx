@@ -7,7 +7,15 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import {
+  AlertCircle,
+  CheckCircle,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  User,
+  XCircle,
+} from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 import type {
   ColumnFiltersState,
@@ -25,6 +33,20 @@ interface DoctorPrescription {
   status: string
   startDate: string
   endDate: string
+  isPaid: boolean
+  patient: {
+    id: number
+    name: string
+    age: number
+    gender: string
+    contact: string
+    address: string
+    user: {
+      firstname: string
+      lastname: string
+      imagelink?: string | null
+    }
+  }
 }
 
 const DoctorPrescriptionsTable: React.FC = () => {
@@ -37,90 +59,160 @@ const DoctorPrescriptionsTable: React.FC = () => {
   })
 
   const user = useAuthStore((state) => state.user)
-
-  console.log('User from auth store:', user)
   const doctorId = Number(user?.doctor?.id)
 
   const { data: doctorData, isLoading, error } = useDoctor(doctorId)
-  console.log('Doctor Data:', doctorData)
 
   const columnHelper = createColumnHelper<DoctorPrescription>()
 
+  const getStatusIcon = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return <CheckCircle className="w-4 h-4" />
+      case 'completed':
+        return <CheckCircle className="w-4 h-4" />
+      case 'inactive':
+        return <Clock className="w-4 h-4" />
+      case 'expired':
+        return <XCircle className="w-4 h-4" />
+      default:
+        return <AlertCircle className="w-4 h-4" />
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return 'bg-green-50 text-green-700 border border-green-200'
+      case 'completed':
+        return 'bg-blue-50 text-blue-700 border border-blue-200'
+      case 'inactive':
+        return 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+      case 'expired':
+        return 'bg-red-50 text-red-700 border border-red-200'
+      default:
+        return 'bg-gray-50 text-gray-700 border border-gray-200'
+    }
+  }
+
+  const getPaymentStatusIcon = (isPaid: boolean) => {
+    return isPaid ? (
+      <CheckCircle className="w-4 h-4" />
+    ) : (
+      <Clock className="w-4 h-4" />
+    )
+  }
+
+  const getPaymentStatusColor = (isPaid: boolean) => {
+    return isPaid
+      ? 'bg-green-50 text-green-700 border border-green-200'
+      : 'bg-orange-50 text-orange-700 border border-orange-200'
+  }
+
   const columns = useMemo(
     () => [
-      columnHelper.accessor('id', {
-        header: 'ID',
-        cell: (info) => info.getValue(),
-        size: 50,
-      }),
       columnHelper.accessor('medicationName', {
-        header: 'Medication Name',
+        header: 'Medication',
         cell: (info) => (
-          <div className="max-w-md truncate" title={info.getValue()}>
-            <span className="font-medium text-gray-900">{info.getValue()}</span>
-          </div>
-        ),
-      }),
-      columnHelper.accessor('dosage', {
-        header: 'Dosage',
-        cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-              {info.getValue()}
-            </span>
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <div className="w-4 h-4 bg-blue-600 rounded"></div>
+            </div>
+            <div>
+              <div className="font-medium text-gray-900">{info.getValue()}</div>
+              <div className="text-sm text-gray-500">
+                {info.row.original.dosage}
+              </div>
+            </div>
           </div>
         ),
       }),
       columnHelper.accessor('frequency', {
         header: 'Frequency',
         cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-              {info.getValue()}
-            </span>
-          </div>
+          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+            {info.getValue()}
+          </span>
         ),
       }),
       columnHelper.accessor('status', {
         header: 'Status',
         cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                info.getValue().toLowerCase() === 'active'
-                  ? 'bg-green-100 text-green-800'
-                  : info.getValue().toLowerCase() === 'completed'
-                    ? 'bg-blue-100 text-blue-800'
-                    : info.getValue().toLowerCase() === 'cancelled'
-                      ? 'bg-red-100 text-red-800'
-                      : info.getValue().toLowerCase() === 'expired'
-                        ? 'bg-gray-100 text-gray-800'
-                        : 'bg-yellow-100 text-yellow-800'
-              }`}
-            >
-              {info.getValue()}
-            </span>
+          <div
+            className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(info.getValue())}`}
+          >
+            {getStatusIcon(info.getValue())}
+            <span className="capitalize">{info.getValue()}</span>
           </div>
         ),
       }),
-      columnHelper.accessor('startDate', {
-        header: 'Start Date',
+      columnHelper.accessor('isPaid', {
+        header: 'Payment',
+        cell: (info) => (
+          <div
+            className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${getPaymentStatusColor(info.getValue())}`}
+          >
+            {getPaymentStatusIcon(info.getValue())}
+            <span>{info.getValue() ? 'Fulfilled' : 'Pending'}</span>
+          </div>
+        ),
+      }),
+      columnHelper.display({
+        id: 'dates',
+        header: 'Duration',
         cell: (info) => {
-          const date = new Date(info.getValue())
+          const startDate = new Date(info.row.original.startDate)
+          const endDate = new Date(info.row.original.endDate)
           return (
-            <div className="max-w-xs truncate" title={date.toDateString()}>
-              {date.toLocaleDateString()}
+            <div className="text-sm">
+              <div className="font-medium text-gray-900">
+                {startDate.toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </div>
+              <div className="text-gray-500">
+                to{' '}
+                {endDate.toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </div>
             </div>
           )
         },
       }),
-      columnHelper.accessor('endDate', {
-        header: 'End Date',
+      columnHelper.display({
+        id: 'prescribedTo',
+        header: 'Prescribed To',
         cell: (info) => {
-          const date = new Date(info.getValue())
+          const patient = info.row.original.patient
+          const patientName = `${patient.user.firstname} ${patient.user.lastname}`
           return (
-            <div className="max-w-xs truncate" title={date.toDateString()}>
-              {date.toLocaleDateString()}
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                {patient.user.imagelink ? (
+                  <img
+                    src={patient.user.imagelink}
+                    alt={patientName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <User className="w-5 h-5 text-gray-400" />
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="font-medium text-gray-900 text-sm truncate">
+                  {patientName}
+                </div>
+                <div className="text-xs text-gray-500 truncate">
+                  {patient.age} years • {patient.gender}
+                </div>
+              </div>
             </div>
           )
         },
@@ -140,7 +232,11 @@ const DoctorPrescriptionsTable: React.FC = () => {
         rowData.dosage?.toLowerCase().includes(searchValue) ||
         rowData.frequency?.toLowerCase().includes(searchValue) ||
         rowData.status?.toLowerCase().includes(searchValue) ||
-        rowData.id?.toString().includes(searchValue)
+        rowData.id?.toString().includes(searchValue) ||
+        `${rowData.patient?.user?.firstname} ${rowData.patient?.user?.lastname}`
+          .toLowerCase()
+          .includes(searchValue) ||
+        rowData.patient?.name?.toLowerCase().includes(searchValue)
       )
     }
   }, [])
@@ -157,6 +253,10 @@ const DoctorPrescriptionsTable: React.FC = () => {
           prescription.endDate instanceof Date
             ? prescription.endDate.toISOString()
             : prescription.endDate,
+        patient: {
+          ...prescription.patient,
+          name: prescription.patient.name ?? '', // Ensure name is always a string
+        },
       })) || []
     )
   }, [doctorData?.prescriptions])
@@ -183,14 +283,18 @@ const DoctorPrescriptionsTable: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="p-4 text-blue-600">Loading doctor prescriptions...</div>
+      <div className="flex items-center justify-center p-8">
+        <div className="text-blue-600">Loading prescriptions...</div>
+      </div>
     )
   }
 
   if (error) {
     return (
-      <div className="p-4 text-red-600">
-        Error fetching doctor prescriptions: {error.message}
+      <div className="flex items-center justify-center p-8">
+        <div className="text-red-600">
+          Error fetching prescriptions: {error.message}
+        </div>
       </div>
     )
   }
@@ -209,66 +313,78 @@ const DoctorPrescriptionsTable: React.FC = () => {
     doctorData?.prescriptions.filter(
       (prescription) => prescription.status === 'completed',
     ).length || 0
+  const paidPrescriptions =
+    doctorData?.prescriptions.filter(
+      (prescription) => prescription.isPaid === true,
+    ).length || 0
 
   return (
-    <div className="p-4">
+    <div className="p-6 bg-white">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Your issued Prescriptions
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          Issued Prescriptions
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">
+
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
+            <div className="text-2xl font-bold text-blue-700">
               {totalPrescriptions}
             </div>
-            <p className="text-sm text-blue-600">Total Prescriptions</p>
+            <p className="text-sm text-blue-600 font-medium">
+              Total Prescriptions
+            </p>
           </div>
-          <div className="bg-green-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">
+          <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
+            <div className="text-2xl font-bold text-green-700">
               {activePrescriptions}
             </div>
-            <p className="text-sm text-green-600">Active</p>
+            <p className="text-sm text-green-600 font-medium">Active</p>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-gray-600">
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-xl border border-gray-200">
+            <div className="text-2xl font-bold text-gray-700">
               {completedPrescriptions}
             </div>
-            <p className="text-sm text-gray-600">Completed</p>
+            <p className="text-sm text-gray-600 font-medium">Completed</p>
+          </div>
+          <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 p-4 rounded-xl border border-emerald-200">
+            <div className="text-2xl font-bold text-emerald-700">
+              {paidPrescriptions}
+            </div>
+            <p className="text-sm text-emerald-600 font-medium">Paid</p>
           </div>
         </div>
 
-        <label
-          htmlFor="search"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Search Prescriptions:
-        </label>
-        <input
-          id="search"
-          type="text"
-          value={search}
-          onChange={handleSearch}
-          placeholder="Search by medication name, dosage, frequency, or status..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
+        {/* Search Input */}
+        <div className="relative">
+          <input
+            id="search"
+            type="text"
+            value={search}
+            onChange={handleSearch}
+            placeholder="Search by medication, patient name, status..."
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+          />
+        </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse border border-gray-300">
+      {/* Table */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+        <table className="min-w-full">
           <thead className="bg-gray-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="border border-gray-300 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-4 text-left text-sm font-semibold text-gray-900"
                     style={{ width: header.getSize() }}
                   >
                     {header.isPlaceholder ? null : (
                       <div
                         className={`flex items-center space-x-2 ${
                           header.column.getCanSort()
-                            ? 'cursor-pointer select-none'
+                            ? 'cursor-pointer select-none hover:text-blue-600'
                             : ''
                         }`}
                         onClick={header.column.getToggleSortingHandler()}
@@ -304,14 +420,11 @@ const DoctorPrescriptionsTable: React.FC = () => {
               </tr>
             ))}
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-gray-100">
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50">
+              <tr key={row.id} className="hover:bg-gray-50 transition-colors">
                 {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="border border-gray-300 px-4 py-3 text-sm text-gray-900"
-                  >
+                  <td key={cell.id} className="px-6 py-4 text-sm">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -322,13 +435,15 @@ const DoctorPrescriptionsTable: React.FC = () => {
       </div>
 
       {table.getRowModel().rows.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          No prescriptions found matching your search.
+        <div className="text-center py-12 text-gray-500">
+          <div className="text-lg font-medium">No prescriptions found</div>
+          <div>Try adjusting your search criteria</div>
         </div>
       )}
 
-      <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="text-sm text-gray-500">
+      {/* Pagination */}
+      <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="text-sm text-gray-600">
           Showing {table.getRowModel().rows.length} of{' '}
           {table.getPrePaginationRowModel().rows.length} prescriptions
           {search &&
@@ -339,21 +454,21 @@ const DoctorPrescriptionsTable: React.FC = () => {
           <button
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'<<'}
           </button>
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'<'}
           </button>
 
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1 px-3 py-2">
             <span className="text-sm text-gray-700">Page</span>
-            <strong className="text-sm">
+            <strong className="text-sm font-semibold">
               {table.getState().pagination.pageIndex + 1} of{' '}
               {table.getPageCount()}
             </strong>
@@ -362,14 +477,14 @@ const DoctorPrescriptionsTable: React.FC = () => {
           <button
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'>'}
           </button>
           <button
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'>>'}
           </button>

@@ -11,7 +11,7 @@ function RouteComponent() {
   return (
     <div className="flex flex-col gap-4 max-w-8xl mx-auto  p-4">
       <PatientStatCard />
-      <div className="flex mt-6">
+      <div className="md:flex mt-6 grid">
         <div className="flex-1">
           <PatientPrescriptions />
         </div>

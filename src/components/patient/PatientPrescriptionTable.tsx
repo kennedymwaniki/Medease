@@ -7,7 +7,16 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp, CreditCard } from 'lucide-react'
+import {
+  AlertCircle,
+  CheckCircle,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  CreditCard,
+  User,
+  XCircle,
+} from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import type {
@@ -18,6 +27,7 @@ import type {
 import { useAuthStore } from '@/store/authStore'
 import { usePaymentsPaystack } from '@/hooks/usePayments'
 import { usePatient } from '@/hooks/usePatients'
+// import type { AnyDataTag } from '@tanstack/react-query'
 
 interface PatientPrescription {
   id: number
@@ -28,6 +38,15 @@ interface PatientPrescription {
   startDate: Date
   endDate: Date
   isPaid: boolean
+  doctor: {
+    id: number
+    prescription: any
+    user: {
+      firstname: string
+      lastname: string
+      imagelink: string
+    }
+  }
 }
 
 const PatientPrescriptionTable: React.FC = () => {
@@ -37,14 +56,12 @@ const PatientPrescriptionTable: React.FC = () => {
   const { payStackPaymentAsync, isPending, paymentError } =
     usePaymentsPaystack()
 
-  // console.log('User from auth store:', user)
   const patientId = Number(user?.patient?.id)
   const {
     data: patientData,
     isLoading,
     error: patienterror,
   } = usePatient(patientId)
-  // console.log('Patient Data for prescriptions:', patientData)
 
   const [search, setSearch] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
@@ -85,97 +102,143 @@ const PatientPrescriptionTable: React.FC = () => {
     }
   }
 
+  const getStatusIcon = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return <CheckCircle className="w-4 h-4" />
+      case 'completed':
+        return <CheckCircle className="w-4 h-4" />
+      case 'inactive':
+        return <Clock className="w-4 h-4" />
+      case 'expired':
+        return <XCircle className="w-4 h-4" />
+      default:
+        return <AlertCircle className="w-4 h-4" />
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return 'bg-green-50 text-green-700 border border-green-200'
+      case 'completed':
+        return 'bg-blue-50 text-blue-700 border border-blue-200'
+      case 'inactive':
+        return 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+      case 'expired':
+        return 'bg-red-50 text-red-700 border border-red-200'
+      default:
+        return 'bg-gray-50 text-gray-700 border border-gray-200'
+    }
+  }
+
+  const getPaymentStatusIcon = (isPaid: boolean) => {
+    return isPaid ? (
+      <CheckCircle className="w-4 h-4" />
+    ) : (
+      <Clock className="w-4 h-4" />
+    )
+  }
+
+  const getPaymentStatusColor = (isPaid: boolean) => {
+    return isPaid
+      ? 'bg-green-50 text-green-700 border border-green-200'
+      : 'bg-orange-50 text-orange-700 border border-orange-200'
+  }
+
   const columns = useMemo(
     () => [
-      columnHelper.accessor('id', {
-        header: 'ID',
-        cell: (info) => info.getValue(),
-        size: 80,
-      }),
       columnHelper.accessor('medicationName', {
         header: 'Medication',
         cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span className="font-medium text-gray-900">{info.getValue()}</span>
-          </div>
-        ),
-      }),
-      columnHelper.accessor('dosage', {
-        header: 'Dosage',
-        cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-              {info.getValue()}
-            </span>
-          </div>
-        ),
-      }),
-      columnHelper.accessor('frequency', {
-        header: 'Frequency',
-        cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
-              {info.getValue()}
-            </span>
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <div className="w-4 h-4 bg-blue-600 rounded"></div>
+            </div>
+            <div>
+              <div className="font-medium text-gray-900">{info.getValue()}</div>
+              <div className="text-sm text-gray-500">
+                {info.row.original.dosage}
+              </div>
+            </div>
           </div>
         ),
       }),
       columnHelper.accessor('status', {
         header: 'Status',
         cell: (info) => (
-          <div className="max-w-xs truncate" title={info.getValue()}>
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                info.getValue().toLowerCase() === 'active'
-                  ? 'bg-green-100 text-green-800'
-                  : info.getValue().toLowerCase() === 'completed'
-                    ? 'bg-blue-100 text-blue-800'
-                    : info.getValue().toLowerCase() === 'cancelled'
-                      ? 'bg-red-100 text-red-800'
-                      : info.getValue().toLowerCase() === 'paused'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
-              }`}
-            >
-              {info.getValue()}
-            </span>
+          <div
+            className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(info.getValue())}`}
+          >
+            {getStatusIcon(info.getValue())}
+            <span className="capitalize">{info.getValue()}</span>
           </div>
         ),
       }),
       columnHelper.accessor('isPaid', {
-        header: 'Payment Status',
+        header: 'Payment',
         cell: (info) => (
-          <div className="max-w-xs truncate">
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                info.getValue()
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
-              }`}
-            >
-              {info.getValue() ? 'Paid' : 'Unpaid'}
-            </span>
+          <div
+            className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${getPaymentStatusColor(info.getValue())}`}
+          >
+            {getPaymentStatusIcon(info.getValue())}
+            <span>{info.getValue() ? 'Fulfilled' : 'Pending'}</span>
           </div>
         ),
       }),
-      columnHelper.accessor('startDate', {
-        header: 'Start Date',
+      columnHelper.display({
+        id: 'dates',
+        header: 'Dates',
         cell: (info) => {
-          const date = new Date(info.getValue())
+          const startDate = new Date(info.row.original.startDate)
+          const endDate = new Date(info.row.original.endDate)
           return (
-            <div className="max-w-xs truncate" title={date.toDateString()}>
-              {date.toLocaleDateString()}
+            <div className="text-sm">
+              <div className="font-medium text-gray-900">
+                {startDate.toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </div>
+              <div className="text-gray-500">
+                to{' '}
+                {endDate.toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </div>
             </div>
           )
         },
       }),
-      columnHelper.accessor('endDate', {
-        header: 'End Date',
+      columnHelper.display({
+        id: 'prescribedBy',
+        header: 'Prescribed By',
         cell: (info) => {
-          const date = new Date(info.getValue())
+          const doctor = info.row.original.doctor
+          const doctorName = `${doctor.user.firstname} ${doctor.user.lastname}`
           return (
-            <div className="max-w-xs truncate" title={date.toDateString()}>
-              {date.toLocaleDateString()}
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200">
+                {doctor.user.imagelink ? (
+                  <img
+                    src={doctor.user.imagelink}
+                    alt={doctorName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-gray-400" />
+                  </div>
+                )}
+              </div>
+              <div>
+                <div className="font-medium text-gray-900 text-sm">
+                  {doctorName}
+                </div>
+              </div>
             </div>
           )
         },
@@ -192,22 +255,22 @@ const PatientPrescriptionTable: React.FC = () => {
               <button
                 disabled={isDisabled}
                 onClick={() => !isPaid && handlePayment(info.row.original.id)}
-                className={`flex items-center gap-1 px-3 py-1 text-white text-xs font-medium rounded transition-colors focus:outline-none focus:ring-2 ${
+                className={`flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-lg transition-all focus:outline-none focus:ring-2 ${
                   isPaid
                     ? 'bg-gray-400 cursor-not-allowed'
                     : isDisabled
                       ? 'bg-green-400 cursor-not-allowed'
-                      : 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
+                      : 'bg-green-600 hover:bg-green-700 focus:ring-green-500 hover:shadow-md'
                 }`}
                 title={isPaid ? 'Already Paid' : 'Pay for Prescription'}
               >
-                <CreditCard className="w-3 h-3" />
-                {isPaid ? 'Paid' : isPending ? 'Paying.....' : 'Pay Now'}
+                <CreditCard className="w-4 h-4" />
+                {isPaid ? 'Paid' : isPending ? 'Processing...' : 'Pay Now'}
               </button>
             </div>
           )
         },
-        size: 100,
+        size: 120,
         enableSorting: false,
       }),
     ],
@@ -225,7 +288,10 @@ const PatientPrescriptionTable: React.FC = () => {
         rowData.dosage?.toLowerCase().includes(searchValue) ||
         rowData.frequency?.toLowerCase().includes(searchValue) ||
         rowData.status?.toLowerCase().includes(searchValue) ||
-        rowData.id?.toString().includes(searchValue)
+        rowData.id?.toString().includes(searchValue) ||
+        `${rowData.doctor?.user?.firstname} ${rowData.doctor?.user?.lastname}`
+          .toLowerCase()
+          .includes(searchValue)
       )
     }
   }, [])
@@ -234,8 +300,16 @@ const PatientPrescriptionTable: React.FC = () => {
     data:
       patientData?.prescriptions.map((prescription) => ({
         ...prescription,
-        startDate: prescription.startDate,
+        startDate: new Date(prescription.startDate),
         endDate: new Date(prescription.endDate),
+        doctor: prescription.doctor || {
+          id: 0,
+          user: {
+            firstname: 'Unknown',
+            lastname: 'Doctor',
+            imagelink: '',
+          },
+        },
       })) || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
@@ -257,24 +331,36 @@ const PatientPrescriptionTable: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="p-4 text-blue-600">Loading patient prescriptions...</div>
+      <div className="flex items-center justify-center p-8">
+        <div className="text-blue-600">Loading patient prescriptions...</div>
+      </div>
     )
   }
 
   if (patienterror) {
     return (
-      <div className="p-4 text-red-600">
-        Error fetching patient prescriptions: {patienterror.message}
+      <div className="flex items-center justify-center p-8">
+        <div className="text-red-600">
+          Error fetching patient prescriptions: {patienterror.message}
+        </div>
       </div>
     )
   }
 
   if (paymentError) {
-    return <p>An Error Ocurred</p>
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-red-600">An Error Occurred</div>
+      </div>
+    )
   }
 
   if (isPending) {
-    return <p>Loading......</p>
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-blue-600">Loading...</div>
+      </div>
+    )
   }
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -282,43 +368,39 @@ const PatientPrescriptionTable: React.FC = () => {
   }
 
   return (
-    <div className="p-1">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">
+    <div className="p-6 bg-white">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Patient Prescriptions
         </h2>
-        <label
-          htmlFor="search"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Search Prescriptions:
-        </label>
-        <input
-          id="search"
-          type="text"
-          value={search}
-          onChange={handleSearch}
-          placeholder="Search by medication, dosage, frequency, or status..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
+        <div className="relative">
+          <input
+            id="search"
+            type="text"
+            value={search}
+            onChange={handleSearch}
+            placeholder="Search prescriptions..."
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+          />
+        </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse border border-gray-300">
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <table className="min-w-full">
           <thead className="bg-gray-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="border border-gray-300 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-4 text-left text-sm font-semibold text-gray-900"
                     style={{ width: header.getSize() }}
                   >
                     {header.isPlaceholder ? null : (
                       <div
                         className={`flex items-center space-x-2 ${
                           header.column.getCanSort()
-                            ? 'cursor-pointer select-none'
+                            ? 'cursor-pointer select-none hover:text-blue-600'
                             : ''
                         }`}
                         onClick={header.column.getToggleSortingHandler()}
@@ -354,14 +436,11 @@ const PatientPrescriptionTable: React.FC = () => {
               </tr>
             ))}
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-gray-100">
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50">
+              <tr key={row.id} className="hover:bg-gray-50 transition-colors">
                 {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="border border-gray-300 px-6 py-3 text-sm text-gray-900"
-                  >
+                  <td key={cell.id} className="px-6 py-4 text-sm text-gray-900">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -372,13 +451,14 @@ const PatientPrescriptionTable: React.FC = () => {
       </div>
 
       {table.getRowModel().rows.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          No prescriptions found matching your search.
+        <div className="text-center py-12 text-gray-500">
+          <div className="text-lg font-medium">No prescriptions found</div>
+          <div>Try adjusting your search criteria</div>
         </div>
       )}
 
-      <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="text-sm text-gray-500">
+      <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="text-sm text-gray-600">
           Showing {table.getRowModel().rows.length} of{' '}
           {table.getPrePaginationRowModel().rows.length} prescriptions
           {search &&
@@ -389,21 +469,21 @@ const PatientPrescriptionTable: React.FC = () => {
           <button
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'<<'}
           </button>
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'<'}
           </button>
 
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1 px-3 py-2">
             <span className="text-sm text-gray-700">Page</span>
-            <strong className="text-sm">
+            <strong className="text-sm font-semibold">
               {table.getState().pagination.pageIndex + 1} of{' '}
               {table.getPageCount()}
             </strong>
@@ -412,14 +492,14 @@ const PatientPrescriptionTable: React.FC = () => {
           <button
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'>'}
           </button>
           <button
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {'>>'}
           </button>

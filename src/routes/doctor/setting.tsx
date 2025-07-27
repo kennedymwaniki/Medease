@@ -1,15 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
-import DoctorProfile from '@/components/Doctors/DoctorProfile'
 import { PushNotificationSetup } from '@/components/PushNotificationSetup'
 
-export const Route = createFileRoute('/doctor/profile')({
+export const Route = createFileRoute('/doctor/setting')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
   return (
     <div>
-      <DoctorProfile />
       <PushNotificationSetup />
     </div>
   )

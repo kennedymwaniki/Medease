@@ -35,6 +35,7 @@ import { Route as PatientMedicalHistoryRouteImport } from './routes/patient/medi
 import { Route as PatientDoctorsRouteImport } from './routes/patient/doctors'
 import { Route as PatientChatRouteImport } from './routes/patient/chat'
 import { Route as PatientAppointmentsRouteImport } from './routes/patient/appointments'
+import { Route as DoctorSettingRouteImport } from './routes/doctor/setting'
 import { Route as DoctorProfileRouteImport } from './routes/doctor/profile'
 import { Route as DoctorPrescriptionsRouteImport } from './routes/doctor/prescriptions'
 import { Route as DoctorPatientsRouteImport } from './routes/doctor/patients'
@@ -183,6 +184,11 @@ const PatientAppointmentsRoute = PatientAppointmentsRouteImport.update({
   path: '/appointments',
   getParentRoute: () => PatientRouteRoute,
 } as any)
+const DoctorSettingRoute = DoctorSettingRouteImport.update({
+  id: '/setting',
+  path: '/setting',
+  getParentRoute: () => DoctorRouteRoute,
+} as any)
 const DoctorProfileRoute = DoctorProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -301,6 +307,7 @@ export interface FileRoutesByFullPath {
   '/doctor/patients': typeof DoctorPatientsRoute
   '/doctor/prescriptions': typeof DoctorPrescriptionsRoute
   '/doctor/profile': typeof DoctorProfileRoute
+  '/doctor/setting': typeof DoctorSettingRoute
   '/patient/appointments': typeof PatientAppointmentsRoute
   '/patient/chat': typeof PatientChatRoute
   '/patient/doctors': typeof PatientDoctorsRoute
@@ -343,6 +350,7 @@ export interface FileRoutesByTo {
   '/doctor/patients': typeof DoctorPatientsRoute
   '/doctor/prescriptions': typeof DoctorPrescriptionsRoute
   '/doctor/profile': typeof DoctorProfileRoute
+  '/doctor/setting': typeof DoctorSettingRoute
   '/patient/appointments': typeof PatientAppointmentsRoute
   '/patient/chat': typeof PatientChatRoute
   '/patient/doctors': typeof PatientDoctorsRoute
@@ -389,6 +397,7 @@ export interface FileRoutesById {
   '/doctor/patients': typeof DoctorPatientsRoute
   '/doctor/prescriptions': typeof DoctorPrescriptionsRoute
   '/doctor/profile': typeof DoctorProfileRoute
+  '/doctor/setting': typeof DoctorSettingRoute
   '/patient/appointments': typeof PatientAppointmentsRoute
   '/patient/chat': typeof PatientChatRoute
   '/patient/doctors': typeof PatientDoctorsRoute
@@ -436,6 +445,7 @@ export interface FileRouteTypes {
     | '/doctor/patients'
     | '/doctor/prescriptions'
     | '/doctor/profile'
+    | '/doctor/setting'
     | '/patient/appointments'
     | '/patient/chat'
     | '/patient/doctors'
@@ -478,6 +488,7 @@ export interface FileRouteTypes {
     | '/doctor/patients'
     | '/doctor/prescriptions'
     | '/doctor/profile'
+    | '/doctor/setting'
     | '/patient/appointments'
     | '/patient/chat'
     | '/patient/doctors'
@@ -523,6 +534,7 @@ export interface FileRouteTypes {
     | '/doctor/patients'
     | '/doctor/prescriptions'
     | '/doctor/profile'
+    | '/doctor/setting'
     | '/patient/appointments'
     | '/patient/chat'
     | '/patient/doctors'
@@ -739,6 +751,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PatientAppointmentsRouteImport
       parentRoute: typeof PatientRouteRoute
     }
+    '/doctor/setting': {
+      id: '/doctor/setting'
+      path: '/setting'
+      fullPath: '/doctor/setting'
+      preLoaderRoute: typeof DoctorSettingRouteImport
+      parentRoute: typeof DoctorRouteRoute
+    }
     '/doctor/profile': {
       id: '/doctor/profile'
       path: '/profile'
@@ -902,6 +921,7 @@ interface DoctorRouteRouteChildren {
   DoctorPatientsRoute: typeof DoctorPatientsRoute
   DoctorPrescriptionsRoute: typeof DoctorPrescriptionsRoute
   DoctorProfileRoute: typeof DoctorProfileRoute
+  DoctorSettingRoute: typeof DoctorSettingRoute
   DoctorIndexRoute: typeof DoctorIndexRoute
 }
 
@@ -912,6 +932,7 @@ const DoctorRouteRouteChildren: DoctorRouteRouteChildren = {
   DoctorPatientsRoute: DoctorPatientsRoute,
   DoctorPrescriptionsRoute: DoctorPrescriptionsRoute,
   DoctorProfileRoute: DoctorProfileRoute,
+  DoctorSettingRoute: DoctorSettingRoute,
   DoctorIndexRoute: DoctorIndexRoute,
 }
 
