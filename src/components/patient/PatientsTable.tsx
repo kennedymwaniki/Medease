@@ -1,4 +1,3 @@
-import React, { useMemo, useState } from 'react'
 import {
   createColumnHelper,
   flexRender,
@@ -9,24 +8,23 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import {
-  Calendar,
   ChevronDown,
   ChevronUp,
   FileText,
   Phone,
-  Plus,
   Search,
   User,
 } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
+import type { Patient } from '@/types/types'
 import type {
   ColumnFiltersState,
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
-import type { Patient } from '@/types/types'
-import { usePatients } from '@/hooks/usePatients'
-import Modal from '@/components/Modal'
 import DoctorPrescriptionForm from '@/components/Doctors/DoctorPrescriptionForm'
+import Modal from '@/components/Modal'
+import { usePatients } from '@/hooks/usePatients'
 
 const PatientsTable: React.FC = () => {
   const [search, setSearch] = useState('')

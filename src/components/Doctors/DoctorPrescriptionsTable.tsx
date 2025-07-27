@@ -25,6 +25,7 @@ import type {
 import { useDoctor } from '@/hooks/useDoctors'
 import { useAuthStore } from '@/store/authStore'
 
+// Updated interface to match the actual API response
 interface DoctorPrescription {
   id: number
   frequency: string
@@ -36,12 +37,13 @@ interface DoctorPrescription {
   isPaid: boolean
   patient: {
     id: number
-    name: string
-    age: number
-    gender: string
-    contact: string
-    address: string
+    name: string | null // Made nullable to match API
+    age: number | null // Made nullable to match API
+    gender: string | null // Made nullable to match API
+    contact: string | null
+    address: string | null
     user: {
+      id: number
       firstname: string
       lastname: string
       imagelink?: string | null
@@ -190,6 +192,9 @@ const DoctorPrescriptionsTable: React.FC = () => {
         cell: (info) => {
           const patient = info.row.original.patient
           const patientName = `${patient.user.firstname} ${patient.user.lastname}`
+          const displayAge = patient.age ?? 'N/A'
+          const displayGender = patient.gender ?? 'N/A'
+
           return (
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
@@ -210,7 +215,7 @@ const DoctorPrescriptionsTable: React.FC = () => {
                   {patientName}
                 </div>
                 <div className="text-xs text-gray-500 truncate">
-                  {patient.age} years • {patient.gender}
+                  {displayAge} years • {displayGender}
                 </div>
               </div>
             </div>
@@ -241,23 +246,41 @@ const DoctorPrescriptionsTable: React.FC = () => {
     }
   }, [])
 
+  // Updated data transformation to properly handle nullable fields and type conversion
   const transformedData = useMemo(() => {
     return (
-      doctorData?.prescriptions.map((prescription) => ({
-        ...prescription,
-        startDate:
-          prescription.startDate instanceof Date
-            ? prescription.startDate.toISOString()
-            : prescription.startDate,
-        endDate:
-          prescription.endDate instanceof Date
-            ? prescription.endDate.toISOString()
-            : prescription.endDate,
-        patient: {
-          ...prescription.patient,
-          name: prescription.patient.name ?? '', // Ensure name is always a string
-        },
-      })) || []
+      doctorData?.prescriptions.map(
+        (prescription): DoctorPrescription => ({
+          id: prescription.id,
+          frequency: prescription.frequency,
+          medicationName: prescription.medicationName,
+          dosage: prescription.dosage,
+          status: prescription.status,
+          isPaid: prescription.isPaid,
+          startDate:
+            prescription.startDate instanceof Date
+              ? prescription.startDate.toISOString()
+              : prescription.startDate,
+          endDate:
+            prescription.endDate instanceof Date
+              ? prescription.endDate.toISOString()
+              : prescription.endDate,
+          patient: {
+            id: prescription.patient.id,
+            name: prescription.patient.name,
+            age: prescription.patient.age,
+            gender: prescription.patient.gender,
+            contact: prescription.patient.contact,
+            address: prescription.patient.address,
+            user: {
+              id: prescription.patient.user.id,
+              firstname: prescription.patient.user.firstname,
+              lastname: prescription.patient.user.lastname,
+              imagelink: prescription.patient.user.imagelink,
+            },
+          },
+        }),
+      ) || []
     )
   }, [doctorData?.prescriptions])
 
@@ -303,7 +326,7 @@ const DoctorPrescriptionsTable: React.FC = () => {
     setSearch(event.target.value)
   }
 
-  // Calculate prescription statistics
+  // Calculate prescription statistics with null safety
   const totalPrescriptions = doctorData?.prescriptions.length || 0
   const activePrescriptions =
     doctorData?.prescriptions.filter(
