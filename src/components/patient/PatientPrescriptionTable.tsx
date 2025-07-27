@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import {
   createColumnHelper,
   flexRender,
@@ -40,7 +41,7 @@ interface PatientPrescription {
   isPaid: boolean
   doctor: {
     id: number
-    prescription: any
+    // prescription: any
     user: {
       firstname: string
       lastname: string

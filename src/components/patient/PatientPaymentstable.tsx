@@ -1,4 +1,3 @@
-import React, { useMemo, useState } from 'react'
 import {
   createColumnHelper,
   flexRender,
@@ -21,14 +20,15 @@ import {
   RefreshCw,
   XCircle,
 } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
 import type {
   ColumnFiltersState,
   PaginationState,
   SortingState,
 } from '@tanstack/react-table'
 import type { Payment } from '@/types/types'
-import { usePatient } from '@/hooks/usePatients'
 import { useAuthStore } from '@/store/authStore'
+import { usePatient } from '@/hooks/usePatients'
 
 const PatientPaymentsTable: React.FC = () => {
   const [search, setSearch] = useState('')
@@ -94,7 +94,6 @@ const PatientPaymentsTable: React.FC = () => {
         header: 'Payment Details',
         cell: (info) => {
           const payment = info.row.original
-          // const _date = new Date(payment.paymentDate)
           return (
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
