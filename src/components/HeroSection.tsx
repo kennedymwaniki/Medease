@@ -1,6 +1,6 @@
 const HeroSection = () => {
   return (
-    <section className="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen py-6 lg:py-12">
+    <section className="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen py-4 lg:py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[80vh]">
           {/* Left Content Section */}
