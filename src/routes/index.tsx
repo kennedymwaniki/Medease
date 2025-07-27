@@ -7,6 +7,7 @@ import HeroSection from '@/components/HeroSection'
 import InfoSection from '@/components/InfoSection'
 import { MarqueeDemo } from '@/components/magicui/MarqueeDemo'
 import NavBar from '@/components/NavBar'
+import FAQSection from '@/components/FAQSection'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -20,6 +21,7 @@ function App() {
       <InfoSection />
       <DepartmentsSection />
       <HealthcareComponent />
+      <FAQSection />
       <MarqueeDemo />
       <Footer />
     </div>
