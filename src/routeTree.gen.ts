@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProgramsRouteImport } from './routes/programs'
+import { Route as PasswordResetRouteImport } from './routes/password-reset'
 import { Route as PageRouteImport } from './routes/page'
 import { Route as OtpVerificationRouteImport } from './routes/otp-verification'
 import { Route as LoginRouteImport } from './routes/login'
@@ -67,6 +68,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const ProgramsRoute = ProgramsRouteImport.update({
   id: '/programs',
   path: '/programs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PasswordResetRoute = PasswordResetRouteImport.update({
+  id: '/password-reset',
+  path: '/password-reset',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PageRoute = PageRouteImport.update({
@@ -287,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/otp-verification': typeof OtpVerificationRoute
   '/page': typeof PageRoute
+  '/password-reset': typeof PasswordResetRoute
   '/programs': typeof ProgramsRoute
   '/register': typeof RegisterRoute
   '/services': typeof ServicesRoute
@@ -330,6 +337,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/otp-verification': typeof OtpVerificationRoute
   '/page': typeof PageRoute
+  '/password-reset': typeof PasswordResetRoute
   '/programs': typeof ProgramsRoute
   '/register': typeof RegisterRoute
   '/services': typeof ServicesRoute
@@ -377,6 +385,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/otp-verification': typeof OtpVerificationRoute
   '/page': typeof PageRoute
+  '/password-reset': typeof PasswordResetRoute
   '/programs': typeof ProgramsRoute
   '/register': typeof RegisterRoute
   '/services': typeof ServicesRoute
@@ -425,6 +434,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/otp-verification'
     | '/page'
+    | '/password-reset'
     | '/programs'
     | '/register'
     | '/services'
@@ -468,6 +478,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/otp-verification'
     | '/page'
+    | '/password-reset'
     | '/programs'
     | '/register'
     | '/services'
@@ -514,6 +525,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/otp-verification'
     | '/page'
+    | '/password-reset'
     | '/programs'
     | '/register'
     | '/services'
@@ -561,6 +573,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OtpVerificationRoute: typeof OtpVerificationRoute
   PageRoute: typeof PageRoute
+  PasswordResetRoute: typeof PasswordResetRoute
   ProgramsRoute: typeof ProgramsRoute
   RegisterRoute: typeof RegisterRoute
   ServicesRoute: typeof ServicesRoute
@@ -588,6 +601,13 @@ declare module '@tanstack/react-router' {
       path: '/programs'
       fullPath: '/programs'
       preLoaderRoute: typeof ProgramsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/password-reset': {
+      id: '/password-reset'
+      path: '/password-reset'
+      fullPath: '/password-reset'
+      preLoaderRoute: typeof PasswordResetRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/page': {
@@ -980,6 +1000,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   OtpVerificationRoute: OtpVerificationRoute,
   PageRoute: PageRoute,
+  PasswordResetRoute: PasswordResetRoute,
   ProgramsRoute: ProgramsRoute,
   RegisterRoute: RegisterRoute,
   ServicesRoute: ServicesRoute,
