@@ -14,7 +14,7 @@ export const Route = createFileRoute('/')({
 
 function App() {
   return (
-    <div className="text-center">
+    <div className="">
       <NavBar />
       <HeroSection />
       <InfoSection />
