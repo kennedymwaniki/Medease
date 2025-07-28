@@ -42,7 +42,7 @@ const AdminSideNavigation = ({
         <div className="flex items-center gap-3 mb-12">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center">
             <img
-              src="/public/Medease-logo.png"
+              src="/Medease-logo.png"
               alt="MedEase Logo"
               className="w-8 h-8"
             />
