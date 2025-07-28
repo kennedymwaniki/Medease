@@ -1,4 +1,3 @@
-import React, { useMemo, useState } from 'react'
 import {
   createColumnHelper,
   flexRender,
@@ -13,13 +12,13 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
-  MapPin,
   Pencil,
   Phone,
   Stethoscope,
   Trash,
   User,
 } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
 import type {
   ColumnFiltersState,
   PaginationState,
@@ -364,7 +363,7 @@ const AppointmentsTable = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-9xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">

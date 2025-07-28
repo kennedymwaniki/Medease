@@ -12,28 +12,12 @@ import {
   UserX,
   Users,
 } from 'lucide-react'
-
-// Mock hooks for demonstration
-const useAppointments = () => ({
-  appointments: Array(45).fill({}),
-  isLoading: false,
-})
-const useDoctors = () => ({
-  data: Array(12)
-    .fill({})
-    .map((_, i) => ({ isAvailable: i % 3 !== 0 })),
-  isLoading: false,
-})
-const useMedications = () => ({
-  medications: Array(234).fill({}),
-  isLoading: false,
-})
-const usePatients = () => ({ data: Array(1205).fill({}), isLoading: false })
-const usePrescriptions = () => ({
-  prescriptions: Array(567).fill({}),
-  isLoading: false,
-})
-const useUsers = () => ({ data: Array(1350).fill({}), isLoading: false })
+import { usePatients } from '@/hooks/usePatients'
+import { useDoctors } from '@/hooks/useDoctors'
+import { useMedications } from '@/hooks/useMedications'
+import { useAppointments } from '@/hooks/useAppointments'
+import { usePrescriptions } from '@/hooks/usePrescriptions'
+import { useUsers } from '@/hooks/useUser'
 
 interface StatCardData {
   icon: React.ReactNode
@@ -93,25 +77,25 @@ const AdminStatCard = () => {
     )
   }
 
-  const totalPatients = patientData.length || 0
-  const totalDoctors = doctorData.length || 0
-  const totalMedications = medications.length || 0
-  const totalAppointments = appointments.length || 0
-  const totalPrescriptions = prescriptions.length || 0
-  const totalUsers = userData.length || 0
+  const totalPatients = patientData?.length || 0
+  const totalDoctors = doctorData?.length || 0
+  const totalMedications = medications?.length || 0
+  const totalAppointments = appointments?.length || 0
+  const totalPrescriptions = prescriptions?.length || 0
+  const totalUsers = userData?.length || 0
 
   const availableDoctors =
-    doctorData.filter((doctor) => doctor.isAvailable).length || 0
+    doctorData?.filter((doctor) => doctor.isAvailable).length || 0
   const unavailableDoctors =
-    doctorData.filter((doctor) => !doctor.isAvailable).length || 0
+    doctorData?.filter((doctor) => !doctor.isAvailable).length || 0
 
   // Today's appointments
   const today = new Date().toISOString().split('T')[0]
   const todayAppointments =
-    appointments.filter((apt) => apt.date === today).length || 0
+    appointments?.filter((apt) => apt.date === today).length || 0
 
   // Calculate some additional metrics
-  const activeSystemLoad = Math.min(100, Math.round((totalUsers / 2000) * 100))
+  const activeSystemLoad = Math.min(100, Math.round((totalUsers / 200) * 100))
   const averageAppointmentsPerDay = Math.round(totalAppointments / 30)
 
   const statData: Array<StatCardData> = [
