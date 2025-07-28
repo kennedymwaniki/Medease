@@ -121,6 +121,8 @@ export interface Prescription {
   doctor: {
     id: number
     user: { firstname: string; lastname: string; imagelink: string }
+    specialization: string
+    experience: number
   }
   id: number
   frequency: string
@@ -133,6 +135,7 @@ export interface Prescription {
   patient: Patient
   payment?: Payment
   medication: Medication
+  doctro: Doctor
 }
 
 export interface Payment {
