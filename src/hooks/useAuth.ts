@@ -33,7 +33,7 @@ export const useLogin = () => {
 }
 
 export const useRegister = () => {
-  const { mutateAsync, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
       console.log('Registration successful:', data)
@@ -42,7 +42,7 @@ export const useRegister = () => {
       toast.error(`Registration failed: ${error.message}`)
     },
   })
-  return { mutateAsync, isPending }
+  return { mutate, isPending }
 }
 
 export const useLogout = () => {

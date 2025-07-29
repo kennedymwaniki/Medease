@@ -63,7 +63,7 @@ const validateField = <T,>(value: T, schema: z.ZodType<T>) => {
 }
 
 function RegistrationForm() {
-  const { mutateAsync: registerUser } = useRegister()
+  const { mutate: registerUser } = useRegister()
   const form = useForm({
     defaultValues: {
       firstname: '',
@@ -73,7 +73,7 @@ function RegistrationForm() {
       confirmPassword: '',
       role: '',
     } satisfies RegistrationFormData,
-    onSubmit: async ({ value }) => {
+    onSubmit: ({ value }) => {
       // Final validation before submission
       const result = registrationSchema.safeParse(value)
       if (!result.success) {
@@ -85,7 +85,7 @@ function RegistrationForm() {
 
       // Remove confirmPassword from the data sent to the server
       const { confirmPassword, ...userData } = value
-      await registerUser(userData)
+      registerUser(userData)
       // if (error) {
       //   console.error('Error creating user:', error)
       // } else {
