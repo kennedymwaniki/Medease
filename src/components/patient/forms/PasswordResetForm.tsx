@@ -2,6 +2,7 @@ import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useState } from 'react'
 import { ArrowLeft, Mail } from 'lucide-react'
+import { usePasswordResetRequest } from '@/hooks/useAuth'
 
 // Zod schema for email validation
 const passwordResetSchema = z.object({
@@ -25,6 +26,7 @@ const validateField = <T,>(value: T, schema: z.ZodType<T>) => {
 function PasswordResetForm() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [submittedEmail, setSubmittedEmail] = useState('')
+  const { passwordResetMutation } = usePasswordResetRequest()
 
   const form = useForm({
     defaultValues: {
@@ -44,6 +46,9 @@ function PasswordResetForm() {
       try {
         // Here you would typically call your API to send the reset code
         await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API delay
+
+        await passwordResetMutation(value.email)
+        console.log('Reset code sent successfully')
 
         setSubmittedEmail(value.email)
         setIsSubmitted(true)

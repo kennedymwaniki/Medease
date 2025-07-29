@@ -1,9 +1,12 @@
 import { useForm } from '@tanstack/react-form'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { z } from 'zod'
+import { usePasswordResetConfirm } from '@/hooks/useAuth'
 
 // Zod schema for verification code and password validation
 const verificationSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
   code: z
     .string()
     .length(6, 'Code must be exactly 6 digits')
@@ -29,9 +32,9 @@ const validateField = <T,>(value: T, schema: z.ZodType<T>) => {
 }
 
 function OtpVerificationForm2() {
-  const [email] = useState('Your otp code has been sent to your email')
-  const [timer, setTimer] = useState(240) // 4:00 in seconds
+  const [timer, setTimer] = useState(240)
   const [canResend, setCanResend] = useState(false)
+  const { passwordResetConfirmMutation } = usePasswordResetConfirm()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -55,39 +58,46 @@ function OtpVerificationForm2() {
 
   const form = useForm({
     defaultValues: {
+      email: '',
       code: '',
       newPassword: '',
     } satisfies VerificationFormData,
     onSubmit: async ({ value }) => {
-      // Final validation before submission
       const result = verificationSchema.safeParse(value)
       if (!result.success) {
         console.error('Validation failed:', result.error.issues)
         return
       }
 
-      console.log('Verification code and password submitted:', {
-        code: value.code,
-        passwordLength: value.newPassword.length,
-      })
-      // Here you would typically send the code and new password to your backend
-      // For now, we're just logging it
-      alert(
-        `Verification code ${value.code} and new password submitted successfully!`,
-      )
+      try {
+        await passwordResetConfirmMutation({
+          email: value.email,
+          otp: value.code,
+          newPassword: value.newPassword,
+        })
+        toast.success('Password reset successfully!')
+        // navigate to login
+        window.location.href = '/login'
+      } catch (error) {
+        toast.error('Password reset failed. Please try again.')
+      }
     },
   })
 
   const handleResendCode = () => {
+    const email = form.getFieldValue('email')
+    if (!email) {
+      toast.error('Please enter your email address first')
+      return
+    }
     console.log('Resending code to:', email)
-    setTimer(225) // Reset timer to 3:45
+    setTimer(225)
     setCanResend(false)
-    // Here you would typically call your API to resend the code
+    toast.info('Verification code resent to your email')
   }
 
   const handleBackToLogin = () => {
     console.log('Navigating back to login')
-    // Here you would typically navigate to login page
     window.location.href = '/login'
   }
 
@@ -115,7 +125,6 @@ function OtpVerificationForm2() {
               Enter the 6-digit code sent to your email and set your new
               password
             </p>
-            <p className="text-sm font-medium text-gray-900 mb-6">{email}</p>
           </div>
 
           <form
@@ -126,6 +135,45 @@ function OtpVerificationForm2() {
             }}
             className="space-y-6"
           >
+            <form.Field
+              name="email"
+              validators={{
+                onChange: ({ value }) =>
+                  validateField(value, verificationSchema.shape.email),
+                onBlur: ({ value }) =>
+                  validateField(value, verificationSchema.shape.email),
+              }}
+              children={(field) => (
+                <div>
+                  <label
+                    htmlFor={field.name}
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      field.state.meta.errors.length > 0
+                        ? 'border-red-500 focus:ring-red-500'
+                        : 'border-gray-300'
+                    }`}
+                    placeholder="Enter your email address"
+                  />
+                  {field.state.meta.errors.length > 0 && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {String(field.state.meta.errors[0])}
+                    </p>
+                  )}
+                </div>
+              )}
+            />
+
             <form.Field
               name="code"
               validators={{

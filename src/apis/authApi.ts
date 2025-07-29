@@ -14,3 +14,21 @@ export const logout = async () => {
   const response = await api.post('/auth/logout')
   return response.data
 }
+
+export const passwordResetRequest = async (email: string) => {
+  const request = await api.post('/auth/password-reset-request', { email })
+  return request.data
+}
+
+export const passwordResetConfirm = async (
+  email: string,
+  otp: string,
+  password: string,
+) => {
+  const request = await api.post('/auth/password-reset', {
+    email,
+    otp,
+    password,
+  })
+  return request.data
+}

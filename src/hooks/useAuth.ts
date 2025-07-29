@@ -1,6 +1,12 @@
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { login, registerUser } from '@/apis/authApi'
+import { toast } from 'sonner'
+import {
+  login,
+  passwordResetConfirm,
+  passwordResetRequest,
+  registerUser,
+} from '@/apis/authApi'
 import { useAuthStore } from '@/store/authStore'
 
 export const useLogin = () => {
@@ -27,16 +33,20 @@ export const useLogin = () => {
 }
 
 export const useRegister = () => {
-  const { mutate, isPending, error } = useMutation({
+  const {
+    mutate,
+    isPending,
+    error: registrationError,
+  } = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
       console.log('Registration successful:', data)
     },
     onError: (error) => {
-      console.error('Registration failed', error)
+      toast.error(`Registration failed: ${error.message}`)
     },
   })
-  return { mutate, isPending, error }
+  return { mutate, isPending, registrationError }
 }
 
 export const useLogout = () => {
@@ -49,4 +59,48 @@ export const useLogout = () => {
   }
 
   return logout
+}
+
+export const usePasswordResetRequest = () => {
+  const {
+    mutateAsync: passwordResetMutation,
+    isPending,
+    error: resetError,
+  } = useMutation({
+    mutationFn: (email: string) => passwordResetRequest(email),
+    onSuccess: () => {
+      toast.success('Password reset request sent successfully')
+    },
+    onError: (error) => {
+      toast.error(`Password reset request failed: ${error.message}`)
+    },
+  })
+
+  return { passwordResetMutation, isPending, resetError }
+}
+
+export const usePasswordResetConfirm = () => {
+  const {
+    mutateAsync: passwordResetConfirmMutation,
+    isPending,
+    error: confirmError,
+  } = useMutation({
+    mutationFn: ({
+      email,
+      otp,
+      newPassword,
+    }: {
+      email: string
+      otp: string
+      newPassword: string
+    }) => passwordResetConfirm(email, otp, newPassword),
+    onSuccess: () => {
+      toast.success('Password reset confirmed successfully')
+    },
+    onError: (error) => {
+      toast.error(`Password reset confirmation failed: ${error.message}`)
+    },
+  })
+
+  return { passwordResetConfirmMutation, isPending, confirmError }
 }

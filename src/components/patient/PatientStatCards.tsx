@@ -176,7 +176,7 @@ const PatientStatCard: React.FC = () => {
   ]
 
   return (
-    <div className="p-6 space-y-8 bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen">
+    <div className="p-2 space-y-8 bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen">
       <div className="text-center space-y-2 mb-8">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
           My Healthcare Dashboard
