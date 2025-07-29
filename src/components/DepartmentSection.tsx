@@ -4,7 +4,7 @@ const DepartmentsSection = () => {
       title: 'Cardiology',
       description:
         'Expert heart care from routine check-ups to advanced cardiac treatments.',
-      bgImage: 'public/cardiology.png',
+      bgImage: '/cardiology.png',
       size: 'large',
     },
     {
