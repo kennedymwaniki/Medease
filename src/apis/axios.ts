@@ -4,7 +4,7 @@ import type { UserRole } from '@/types/types'
 import { useAuthStore } from '@/store/authStore'
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: 'https://medeaseapi.onrender.com',
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
