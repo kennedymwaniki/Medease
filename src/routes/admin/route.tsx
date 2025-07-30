@@ -1,7 +1,6 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import {
   FaCalendarAlt,
-  FaChartBar,
   FaCog,
   FaHome,
   FaPills,

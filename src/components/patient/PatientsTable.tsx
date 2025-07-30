@@ -15,7 +15,6 @@ import {
   Search,
   User,
 } from 'lucide-react'
-import { toast } from 'sonner'
 import React, { useMemo, useState } from 'react'
 import type { Patient } from '@/types/types'
 import type {
