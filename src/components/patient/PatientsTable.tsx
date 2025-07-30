@@ -15,6 +15,7 @@ import {
   Search,
   User,
 } from 'lucide-react'
+import { toast } from 'sonner'
 import React, { useMemo, useState } from 'react'
 import type { Patient } from '@/types/types'
 import type {
@@ -59,6 +60,14 @@ const PatientsTable: React.FC = () => {
   const handlePrescriptionSuccess = () => {
     handleModalClose()
   }
+
+  // const handleScheduleClick = () => {
+  //   toast.warning('Schedule Appointment button clicked!')
+  //   toast.info(`Current modal state: ${isModalOpen}`)
+  //   toast.info('Setting modal to open...')
+  //   setIsModalOpen(true)
+  //   toast.success('Modal state after setting: true')
+  // }
 
   const getGenderColor = (gender: string) => {
     switch (gender.toLowerCase()) {

@@ -57,7 +57,7 @@ const DoctorPrescriptionsTable: React.FC = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 5,
   })
 
   const user = useAuthStore((state) => state.user)
@@ -132,7 +132,7 @@ const DoctorPrescriptionsTable: React.FC = () => {
       columnHelper.accessor('frequency', {
         header: 'Frequency',
         cell: (info) => (
-          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-nowrap text-sm font-medium">
             {info.getValue()}
           </span>
         ),
@@ -167,14 +167,14 @@ const DoctorPrescriptionsTable: React.FC = () => {
           const endDate = new Date(info.row.original.endDate)
           return (
             <div className="text-sm">
-              <div className="font-medium text-gray-900">
+              <div className="font-medium text-gray-900 text-nowrap">
                 {startDate.toLocaleDateString('en-GB', {
                   day: 'numeric',
                   month: 'short',
                   year: 'numeric',
                 })}
               </div>
-              <div className="text-gray-500">
+              <div className="text-gray-500 text-nowrap">
                 to{' '}
                 {endDate.toLocaleDateString('en-GB', {
                   day: 'numeric',

@@ -39,6 +39,7 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@stream-io/video-react-sdk": "^1.18.12",
     "@supabase/supabase-js": "^2.50.3",
+    "@table-library/react-table-library": "^4.1.15",
     "@tabler/icons-react": "^3.34.0",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/match-sorter-utils": "^8.19.4",

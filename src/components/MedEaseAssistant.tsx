@@ -18,7 +18,34 @@ import AppointmentBooking from './patient/AppointmentBooking'
 
 export const VITE_API_KEY = import.meta.env.VITE_API_KEY!
 
-// console.log('VITE_API_KEY:', VITE_API_KEY)
+const stripMarkdown = (text: any) => {
+  return (
+    text
+      // Remove headers (# ## ### etc.)
+      .replace(/^#{1,6}\s+/gm, '')
+      // Remove bold (**text** or __text__)
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/__(.*?)__/g, '$1')
+      // Remove italic (*text* or _text_)
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/_(.*?)_/g, '$1')
+      // Remove strikethrough (~~text~~)
+      .replace(/~~(.*?)~~/g, '$1')
+      // Remove inline code (`code`)
+      .replace(/`([^`]+)`/g, '$1')
+      // Remove code blocks (```code```)
+      .replace(/```[\s\S]*?```/g, '')
+      // Remove links [text](url) - keep just the text
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // Remove bullet points (- or * at start of line)
+      .replace(/^[\s]*[-*]\s+/gm, '')
+      // Remove numbered lists (1. 2. etc.)
+      .replace(/^[\s]*\d+\.\s+/gm, '')
+      // Clean up extra whitespace
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+  )
+}
 
 interface Message {
   id: string
@@ -187,12 +214,16 @@ const MedEaseAssistant = () => {
         for (const choice of JSON.parse(event.data).choices) {
           const chunk = choice.delta?.content ?? ''
           assistantResponse += chunk
-          // Update the assistant message with streaming response
+
+          // Strip markdown from the response before updating state
+          const cleanResponse = stripMarkdown(assistantResponse)
+
+          // Update the assistant message with cleaned streaming response
           setMessages((prev) => {
             const newMessages = [...prev]
             const lastMessage = newMessages[newMessages.length - 1]
             if (lastMessage.id === assistantMessageId) {
-              lastMessage.content = assistantResponse
+              lastMessage.content = cleanResponse
             }
             return newMessages
           })

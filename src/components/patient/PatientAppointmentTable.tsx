@@ -454,7 +454,6 @@ const PatientAppointmentTable: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal for Appointment Booking */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

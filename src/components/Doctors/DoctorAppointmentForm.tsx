@@ -54,6 +54,8 @@ interface DoctorAppointmentFormProps {
 const DoctorAppointmentForm = ({
   onAppointmentSuccess,
 }: DoctorAppointmentFormProps) => {
+  const user = useAuthStore((state) => state.user)
+  const doctorId = Number(user?.doctor?.id)
   const { data: patients, isLoading, error } = usePatients()
   const [currentStep, setCurrentStep] = useState(1)
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
@@ -61,8 +63,6 @@ const DoctorAppointmentForm = ({
   const [searchTerm, setSearchTerm] = useState('')
 
   const { createAppointment } = useCreateAppointment()
-  const user = useAuthStore((state) => state.user)
-  const doctorId = Number(user?.doctor?.id)
 
   const form = useForm({
     defaultValues: {

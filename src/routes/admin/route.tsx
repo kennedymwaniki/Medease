@@ -70,12 +70,12 @@ function RouteComponent() {
     //   icon: <FaCreditCard />,
     //   category: 'Operations',
     // },
-    {
-      label: 'Reports',
-      url: '/admin/reports',
-      icon: <FaChartBar />,
-      category: 'Operations',
-    },
+    // {
+    //   label: 'Reports',
+    //   url: '/admin/reports',
+    //   icon: <FaChartBar />,
+    //   category: 'Operations',
+    // },
     {
       label: 'Settings',
       url: '/admin/settings',
