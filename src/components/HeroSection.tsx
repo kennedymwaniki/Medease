@@ -3,9 +3,7 @@ const HeroSection = () => {
     <section className="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen py-4 lg:py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[80vh]">
-          {/* Left Content Section */}
           <div className="space-y-8 order-2 lg:order-1 flex flex-col justify-center">
-            {/* Main Content */}
             <div className="space-y-6">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 leading-tight">
                 Empowering
@@ -23,7 +21,6 @@ const HeroSection = () => {
               </p>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <button className="bg-white text-gray-800 font-medium py-4 px-8 rounded-full border border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                 Explore Services
@@ -46,7 +43,6 @@ const HeroSection = () => {
               </button>
             </div>
 
-            {/* Trust Indicator */}
             <div className="flex items-center space-x-6">
               <div className="flex -space-x-3">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold text-sm border-4 border-white shadow-lg">
@@ -71,7 +67,6 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* Right Image Section */}
           <div className="relative order-1 lg:order-2 flex items-center justify-center">
             <div className="relative w-full max-w-lg lg:max-w-none">
               {/* Main Image Container */}

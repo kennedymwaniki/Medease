@@ -112,7 +112,6 @@ const MedEaseAssistant = () => {
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
   const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-001' })
 
-  // Scroll to bottom of messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
@@ -120,7 +119,6 @@ const MedEaseAssistant = () => {
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return
 
-    // Add user message to chat
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -150,7 +148,6 @@ const MedEaseAssistant = () => {
     }
 
     try {
-      // Prepare conversation history for Gemini
       const conversationHistory = messages
         .filter((msg) => msg.role !== 'system')
         .map((msg) => `${msg.role}: ${msg.content}`)
@@ -168,10 +165,8 @@ Current user message: ${currentInput}`
       const response = await result.response
       const text = response.text()
 
-      // Strip markdown from the response
       const cleanResponse = stripMarkdown(text)
 
-      // Add assistant message to chat
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
